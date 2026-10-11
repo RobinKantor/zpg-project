@@ -1,3 +1,8 @@
+/**
+ * @author Robin Kantor
+ * @login KAN0310
+ */
+
 #include "Application.h"
 
 

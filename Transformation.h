@@ -1,3 +1,8 @@
+/**
+ * @author Robin Kantor
+ * @login KAN0310
+ */
+
 #pragma once
 
 #include <glm/glm.hpp>

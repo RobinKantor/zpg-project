@@ -1,3 +1,8 @@
+/**
+ * @author Robin Kantor
+ * @login KAN0310
+ */
+
 #include "CompositeTransformation.h"
 
 void CompositeTransformation::addTransformation(

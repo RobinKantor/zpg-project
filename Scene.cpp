@@ -1,3 +1,7 @@
+/**
+ * @author Robin Kantor
+ * @login KAN0310
+ */
 
 #include "Scene.h"
 

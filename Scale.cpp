@@ -1,3 +1,8 @@
+/**
+ * @author Robin Kantor
+ * @login KAN0310
+ */
+
 #include "Scale.h"
 
 #include <glm/gtc/matrix_transform.hpp>
