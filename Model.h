@@ -10,9 +10,10 @@ private:
 
 public:
 	Model(
-		const float* data,
-		size_t dataSize,
-		GLsizei vertexCount
+		const float* points,
+		int size,
+		int vertexCount,
+		int valuesPerVertex = 6
 	);
 
 	void draw();

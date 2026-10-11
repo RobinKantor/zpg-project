@@ -14,3 +14,12 @@ glm::mat4 Scale::getMatrix() const
         scale
     );
 }
+
+void Scale::setScale(
+    float x,
+    float y,
+    float z
+)
+{
+    scale = glm::vec3(x, y, z);
+}

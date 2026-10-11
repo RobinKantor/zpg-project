@@ -15,3 +15,8 @@ glm::mat4 Rotation::getMatrix() const
         axis
     );
 }
+
+void Rotation::setAngle(float angle)
+{
+    this->angle = angle;
+}

@@ -1,38 +1,19 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
-#include "Model.h"
-#include "ShaderProgram.h"
+#include "DrawableObject.h"
 
 
 class Scene
 {
 private:
-    std::vector<DrawableObject> objects;
+    std::vector<std::shared_ptr<DrawableObject>> objects;
 
 public:
     void addObject(
-        Model* model,
-        ShaderProgram* shader,
-        float x = 0.0f,
-        float y = 0.0f,
-        float z = 0.0f,
-        float scale = 1.0f,
-        float rotationX = 0.0f,
-        float rotationY = 0.0f,
-        float rotationZ = 0.0f
-    );
-
-    void setObjectTransform(
-        int index,
-        float x,
-        float y,
-        float z,
-        float scale,
-        float rotationX,
-        float rotationY,
-        float rotationZ
+        std::shared_ptr<DrawableObject> object
     );
 
     void draw();

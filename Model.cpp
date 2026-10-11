@@ -2,27 +2,68 @@
 
 
 Model::Model(
-	const float* data,
-	size_t dataSize,
-	GLsizei vertexCount
-) {
-	this->vertexCount = vertexCount;
+    const float* points,
+    int size,
+    int vertexCount,
+    int valuesPerVertex
+)
+{
+    this->vertexCount = vertexCount;
 
-	//vertex buffer object (VBO)
-	glGenBuffers(1, &VBO); // generate the VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_STATIC_DRAW);
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        size,
+        points,
+        GL_STATIC_DRAW
+    );
 
-	//Vertex Array Object (VAO)
-	glGenVertexArrays(1, &VAO); //generate the VAO
-	glBindVertexArray(VAO); //bind the VAO
-	glEnableVertexAttribArray(0); //enable vertex attributes
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
-	// index, number of components, data type, normalized, vertex stride, offset
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // Position
+    glVertexAttribPointer(
+        0,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        valuesPerVertex * sizeof(float),
+        (void*)0
+    );
+
+    glEnableVertexAttribArray(0);
+
+    // Color / second vec3
+    glVertexAttribPointer(
+        1,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        valuesPerVertex * sizeof(float),
+        (void*)(3 * sizeof(float))
+    );
+
+    glEnableVertexAttribArray(1);
+
+    // Normal - only models with 9 values per vertex
+    if (valuesPerVertex >= 9)
+    {
+        glVertexAttribPointer(
+            2,
+            3,
+            GL_FLOAT,
+            GL_FALSE,
+            valuesPerVertex * sizeof(float),
+            (void*)(6 * sizeof(float))
+        );
+
+        glEnableVertexAttribArray(2);
+    }
+
+    glBindVertexArray(0);
 }
 
 void Model::draw() {

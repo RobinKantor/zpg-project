@@ -14,3 +14,12 @@ glm::mat4 Translation::getMatrix() const
         translation
     );
 }
+
+void Translation::setTranslation(
+    float x,
+    float y,
+    float z
+)
+{
+    translation = glm::vec3(x, y, z);
+}

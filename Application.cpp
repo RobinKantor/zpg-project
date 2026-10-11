@@ -6,6 +6,17 @@
 
 #include "Models/sphere.h"
 #include "Models/KAN0310.h"
+#include "Models/tree.h"
+#include "Models/bushes.h"
+#include "Models/earth.h"
+#include "Models/sun.h"
+#include "Models/moon.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <memory>
+#include <random>
 
 
 void Application::initialization() {
@@ -76,295 +87,813 @@ void Application::createModels()
 		 0.3f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f
 	};
 
-	float treePoints[] = {
-		// Trunk
-		-0.12f, -0.55f, 0.0f,   0.45f, 0.25f, 0.10f,
-		 0.12f, -0.55f, 0.0f,   0.45f, 0.25f, 0.10f,
-		 0.12f, -0.10f, 0.0f,   0.45f, 0.25f, 0.10f,
-
-		-0.12f, -0.55f, 0.0f,   0.45f, 0.25f, 0.10f,
-		 0.12f, -0.10f, 0.0f,   0.45f, 0.25f, 0.10f,
-		-0.12f, -0.10f, 0.0f,   0.45f, 0.25f, 0.10f,
-
-		// Crown
-		-0.50f, -0.10f, 0.0f,   0.10f, 0.65f, 0.15f,
-		 0.00f,  0.65f, 0.0f,   0.10f, 0.65f, 0.15f,
-		 0.50f, -0.10f, 0.0f,   0.10f, 0.65f, 0.15f
-	};
-
-
-	float bushPoints[] = {
-		-0.60f, -0.20f, 0.0f,   0.15f, 0.70f, 0.20f,
-		-0.30f,  0.30f, 0.0f,   0.15f, 0.70f, 0.20f,
-		 0.00f, -0.20f, 0.0f,   0.15f, 0.70f, 0.20f,
-
-		-0.30f, -0.20f, 0.0f,   0.10f, 0.60f, 0.15f,
-		 0.00f,  0.40f, 0.0f,   0.10f, 0.60f, 0.15f,
-		 0.30f, -0.20f, 0.0f,   0.10f, 0.60f, 0.15f,
-
-		 0.00f, -0.20f, 0.0f,   0.15f, 0.70f, 0.20f,
-		 0.30f,  0.30f, 0.0f,   0.15f, 0.70f, 0.20f,
-		 0.60f, -0.20f, 0.0f,   0.15f, 0.70f, 0.20f
-	};
-
 	model1 = new Model(points1, sizeof(points1), 3);
 	model2 = new Model(points2, sizeof(points2), 3);
 
 	sphereModel = new Model(sphere, sizeof(sphere), 2880);
 
-	treeModel = new Model(treePoints, sizeof(treePoints), 9);
-	bushModel = new Model(bushPoints, sizeof(bushPoints), 9);
+    treeModel = new Model(
+        tree,
+        sizeof(tree),
+        sizeof(tree) / (6 * sizeof(float))
+    );
+
+    bushModel = new Model(
+        bushes,
+        sizeof(bushes),
+        sizeof(bushes) / (6 * sizeof(float))
+    );
 
 	loginModel = new Model(
 		loginKAN0310,
 		sizeof(loginKAN0310),
 		KAN0310_VERTEX_COUNT
 	);
+
+    sunModel = new Model(
+        sun,
+        sizeof(sun),
+        11520,
+        9
+    );
+
+    earthModel = new Model(
+        earth,
+        sizeof(earth),
+        11520,
+        9
+    );
+
+    moonModel = new Model(
+        moon,
+        sizeof(moon),
+        11520,
+        9
+    );
 }
 
 void Application::createScenes()
 {
-	scene1 = new Scene();
-	scene2 = new Scene();
-	scene3 = new Scene();
-	scene4 = new Scene();
+    scene1 = new Scene();
+    scene2 = new Scene();
+    scene3 = new Scene();
+    scene4 = new Scene();
+    scene5 = new Scene();
 
-	scene1->addObject(
-		model1,
-		shader1
-	);
 
-	scene2->addObject(
-		sphereModel,
-		shader1,
-		0.0f,
-		0.0f,
-		0.0f,
-		0.7f
-	);
+    // ---------------------------------------------------------
+    // Scene 1 - triangle
+    // ---------------------------------------------------------
 
-	// Scene 3 - forest
+    auto triangle1 =
+        std::make_shared<DrawableObject>(
+            model1,
+            shader1
+        );
 
-	float treePositions[][2] = {
-		{-0.85f,  0.45f},
-		{-0.55f,  0.50f},
-		{-0.25f,  0.42f},
-		{ 0.05f,  0.50f},
-		{ 0.35f,  0.43f},
-		{ 0.62f,  0.48f},
+    auto transformation1 =
+        std::make_shared<CompositeTransformation>();
 
-		{-0.75f,  0.05f},
-		{-0.45f,  0.10f},
-		{-0.15f,  0.03f},
-		{ 0.15f,  0.10f},
-		{ 0.48f,  0.03f}
-	};
+    transformation1->addTransformation(
+        std::make_shared<Translation>(
+            0.5f,
+            0.0f,
+            0.0f
+        )
+    );
 
-	for (int i = 0; i < 11; i++)
-	{
-		scene3->addObject(
-			treeModel,
-			shader1,
-			treePositions[i][0],
-			treePositions[i][1],
-			0.0f,
-			0.25f
-		);
-	}
+    transformation1->addTransformation(
+        std::make_shared<Rotation>(
+            glm::radians(45.0f),
+            glm::vec3(0.0f, 0.0f, 1.0f)
+        )
+    );
 
-	float bushPositions[][2] = {
-	{-0.88f, -0.42f},
-	{-0.68f, -0.30f},
-	{-0.48f, -0.43f},
-	{-0.28f, -0.32f},
-	{-0.08f, -0.45f},
-	{ 0.12f, -0.30f},
-	{ 0.32f, -0.43f},
-	{ 0.52f, -0.31f},
-	{ 0.72f, -0.43f},
-	{ 0.86f, -0.25f},
-	{ 0.00f, -0.12f}
-	};
+    triangle1->setTransformation(
+        transformation1
+    );
 
-	for (int i = 0; i < 11; i++)
-	{
-		scene3->addObject(
-			bushModel,
-			shader1,
-			bushPositions[i][0],
-			bushPositions[i][1],
-			0.0f,
-			0.18f
-		);
-	}
+    scene1->addObject(
+        triangle1
+    );
 
-	scene3->addObject(
-		sphereModel,
-		shader2,
-		0.75f,
-		0.75f,
-		0.0f,
-		0.15f
-	);
+    auto triangle2 =
+        std::make_shared<DrawableObject>(
+            model1,
+            shader1
+        );
 
-	// Scene 4 - login
-	scene4->addObject(
-		loginModel,
-		shader2,
-		0.0f,
-		0.0f,
-		0.0f,
-		0.8f
-	);
+    auto transformation2 =
+        std::make_shared<CompositeTransformation>();
 
-	// Login signature in scene 1
-	scene1->addObject(
-		loginModel,
-		shader2,
-		0.72f,
-		-0.82f,
-		-0.1f,
-		0.20f
-	);
+    transformation2->addTransformation(
+        std::make_shared<Rotation>(
+            glm::radians(45.0f),
+            glm::vec3(0.0f, 0.0f, 1.0f)
+        )
+    );
 
-	// Login signature in scene 2
-	scene2->addObject(
-		loginModel,
-		shader2,
-		0.72f,
-		-0.82f,
-		-0.1f,
-		0.20f
-	);
+    transformation2->addTransformation(
+        std::make_shared<Translation>(
+            0.5f,
+            0.0f,
+            0.0f
+        )
+    );
 
-	// Login signature in scene 3
-	scene3->addObject(
-		loginModel,
-		shader2,
-		0.72f,
-		-0.82f,
-		-0.1f,
-		0.20f
-	);
+    triangle2->setTransformation(
+        transformation2
+    );
 
-	activeScene = scene1;
+    scene1->addObject(
+        triangle2
+    );
+
+
+    // Login signature
+    auto scene1Login =
+        std::make_shared<DrawableObject>(
+            loginModel,
+            shader2
+        );
+
+    auto scene1LoginTransformation =
+        std::make_shared<CompositeTransformation>();
+
+    scene1LoginTransformation->addTransformation(
+        std::make_shared<Translation>(
+            0.72f,
+            -0.82f,
+            -0.1f
+        )
+    );
+
+    scene1LoginTransformation->addTransformation(
+        std::make_shared<Scale>(
+            0.20f,
+            0.20f,
+            0.20f
+        )
+    );
+
+    scene1Login->setTransformation(
+        scene1LoginTransformation
+    );
+
+    scene1->addObject(
+        scene1Login
+    );
+
+
+    // ---------------------------------------------------------
+    // Scene 2 - sphere
+    // ---------------------------------------------------------
+
+    auto sphereObject =
+        std::make_shared<DrawableObject>(
+            sphereModel,
+            shader1
+        );
+
+    auto sphereTransformation =
+        std::make_shared<CompositeTransformation>();
+
+    sphereTransformation->addTransformation(
+        std::make_shared<Scale>(
+            0.7f,
+            0.7f,
+            0.7f
+        )
+    );
+
+    sphereObject->setTransformation(
+        sphereTransformation
+    );
+
+    scene2->addObject(
+        sphereObject
+    );
+
+
+    // Login signature
+    auto scene2Login =
+        std::make_shared<DrawableObject>(
+            loginModel,
+            shader2
+        );
+
+    auto scene2LoginTransformation =
+        std::make_shared<CompositeTransformation>();
+
+    scene2LoginTransformation->addTransformation(
+        std::make_shared<Translation>(
+            0.72f,
+            -0.82f,
+            -0.1f
+        )
+    );
+
+    scene2LoginTransformation->addTransformation(
+        std::make_shared<Scale>(
+            0.20f,
+            0.20f,
+            0.20f
+        )
+    );
+
+    scene2Login->setTransformation(
+        scene2LoginTransformation
+    );
+
+    scene2->addObject(
+        scene2Login
+    );
+
+
+    // ---------------------------------------------------------
+    // Scene 3 - forest
+    // ---------------------------------------------------------
+
+    // trees
+    std::random_device rd;
+    std::mt19937 generator(rd());
+
+    std::uniform_real_distribution<float> treeX(-0.85f, 0.55f);
+    std::uniform_real_distribution<float> treeY(-0.05f, 0.50f);
+    std::uniform_real_distribution<float> treeScale(0.06f, 0.085f);
+    std::uniform_real_distribution<float> treeRotation(-0.4f, 0.4f);
+
+    for (int i = 0; i < 15; i++)
+    {
+        auto treeObject =
+            std::make_shared<DrawableObject>(
+                treeModel,
+                shader1
+            );
+
+        auto transformation =
+            std::make_shared<CompositeTransformation>();
+
+        transformation->addTransformation(
+            std::make_shared<Translation>(
+                treeX(generator),
+                treeY(generator),
+                0.0f
+            )
+        );
+
+        transformation->addTransformation(
+            std::make_shared<Rotation>(
+                treeRotation(generator),
+                glm::vec3(0.0f, 1.0f, 0.0f)
+            )
+        );
+
+        float scale = treeScale(generator);
+
+        transformation->addTransformation(
+            std::make_shared<Scale>(
+                scale,
+                scale,
+                scale
+            )
+        );
+
+        treeObject->setTransformation(
+            transformation
+        );
+
+        scene3->addObject(
+            treeObject
+        );
+    }
+
+    // bushes
+    std::uniform_real_distribution<float> bushX(-0.90f, 0.90f);
+    std::uniform_real_distribution<float> bushY(-0.65f, -0.15f);
+    std::uniform_real_distribution<float> bushScale(0.40f, 0.65f);
+    std::uniform_real_distribution<float> bushRotation(-0.5f, 0.5f);
+
+    for (int i = 0; i < 15; i++)
+    {
+        auto bushObject =
+            std::make_shared<DrawableObject>(
+                bushModel,
+                shader1
+            );
+
+        auto transformation =
+            std::make_shared<CompositeTransformation>();
+
+        transformation->addTransformation(
+            std::make_shared<Translation>(
+                bushX(generator),
+                bushY(generator),
+                0.0f
+            )
+        );
+
+        transformation->addTransformation(
+            std::make_shared<Rotation>(
+                bushRotation(generator),
+                glm::vec3(0.0f, 1.0f, 0.0f)
+            )
+        );
+
+        float scale = bushScale(generator);
+
+        transformation->addTransformation(
+            std::make_shared<Scale>(
+                scale,
+                scale,
+                scale
+            )
+        );
+
+        bushObject->setTransformation(
+            transformation
+        );
+
+        scene3->addObject(
+            bushObject
+        );
+    }
+
+    // Sun
+    auto sun =
+        std::make_shared<DrawableObject>(
+            sphereModel,
+            shader2
+        );
+
+    auto sunTransformation =
+        std::make_shared<CompositeTransformation>();
+
+    sunTransformation->addTransformation(
+        std::make_shared<Translation>(
+            0.75f,
+            0.75f,
+            0.0f
+        )
+    );
+
+    sunTransformation->addTransformation(
+        std::make_shared<Scale>(
+            0.15f,
+            0.15f,
+            0.15f
+        )
+    );
+
+    sun->setTransformation(
+        sunTransformation
+    );
+
+    scene3->addObject(
+        sun
+    );
+
+
+    // Login signature
+    auto scene3Login =
+        std::make_shared<DrawableObject>(
+            loginModel,
+            shader2
+        );
+
+    auto scene3LoginTransformation =
+        std::make_shared<CompositeTransformation>();
+
+    scene3LoginTransformation->addTransformation(
+        std::make_shared<Translation>(
+            0.72f,
+            -0.82f,
+            -0.1f
+        )
+    );
+
+    scene3LoginTransformation->addTransformation(
+        std::make_shared<Scale>(
+            0.20f,
+            0.20f,
+            0.20f
+        )
+    );
+
+    scene3Login->setTransformation(
+        scene3LoginTransformation
+    );
+
+    scene3->addObject(
+        scene3Login
+    );
+
+
+    // ---------------------------------------------------------
+    // Scene 4 - controllable login
+    // ---------------------------------------------------------
+
+    auto loginObject =
+        std::make_shared<DrawableObject>(
+            loginModel,
+            shader2
+        );
+
+    auto loginTransformation =
+        std::make_shared<CompositeTransformation>();
+
+
+    loginTranslation =
+        std::make_shared<Translation>(
+            0.0f,
+            0.0f,
+            0.0f
+        );
+
+    loginRotationX =
+        std::make_shared<Rotation>(
+            0.0f,
+            glm::vec3(1.0f, 0.0f, 0.0f)
+        );
+
+    loginRotationY =
+        std::make_shared<Rotation>(
+            0.0f,
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+    loginRotationZ =
+        std::make_shared<Rotation>(
+            0.0f,
+            glm::vec3(0.0f, 0.0f, 1.0f)
+        );
+
+    loginScale =
+        std::make_shared<Scale>(
+            0.8f,
+            0.8f,
+            0.8f
+        );
+
+
+    loginTransformation->addTransformation(
+        loginTranslation
+    );
+
+    loginTransformation->addTransformation(
+        loginRotationX
+    );
+
+    loginTransformation->addTransformation(
+        loginRotationY
+    );
+
+    loginTransformation->addTransformation(
+        loginRotationZ
+    );
+
+    loginTransformation->addTransformation(
+        loginScale
+    );
+
+
+    loginObject->setTransformation(
+        loginTransformation
+    );
+
+    scene4->addObject(
+        loginObject
+    );
+
+    // ---------------------------------------------------------
+    // Scene 5 - Solar system
+    // ---------------------------------------------------------
+
+    auto sunObject =
+        std::make_shared<DrawableObject>(
+            sunModel,
+            shader1
+        );
+
+    auto solarSunTransformation =
+        std::make_shared<CompositeTransformation>();
+
+    sunRotation =
+        std::make_shared<Rotation>(
+            0.0f,
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+    solarSunTransformation->addTransformation(
+        sunRotation
+    );
+
+    solarSunTransformation->addTransformation(
+        std::make_shared<Scale>(
+            0.18f,
+            0.18f,
+            0.18f
+        )
+    );
+
+    sunObject->setTransformation(
+        solarSunTransformation
+    );
+
+    scene5->addObject(
+        sunObject
+    );
+
+    auto earthOrbit =
+        std::make_shared<CompositeTransformation>();
+
+    earthOrbitRotation =
+        std::make_shared<Rotation>(
+            0.0f,
+            glm::vec3(0.0f, 0.0f, 1.0f)
+        );
+
+    earthOrbit->addTransformation(
+        earthOrbitRotation
+    );
+
+    earthOrbit->addTransformation(
+        std::make_shared<Translation>(
+            0.55f,
+            0.0f,
+            0.0f
+        )
+    );
+
+    auto earthObject =
+        std::make_shared<DrawableObject>(
+            earthModel,
+            shader1
+        );
+
+    auto earthTransformation =
+        std::make_shared<CompositeTransformation>();
+
+    earthSelfRotation =
+        std::make_shared<Rotation>(
+            0.0f,
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+    earthTransformation->addTransformation(
+        earthOrbit
+    );
+
+    earthTransformation->addTransformation(
+        earthSelfRotation
+    );
+
+    earthTransformation->addTransformation(
+        std::make_shared<Scale>(
+            0.08f,
+            0.08f,
+            0.08f
+        )
+    );
+
+    earthObject->setTransformation(
+        earthTransformation
+    );
+
+    scene5->addObject(
+        earthObject
+    );
+
+    auto moonObject =
+        std::make_shared<DrawableObject>(
+            moonModel,
+            shader1
+        );
+
+    auto moonTransformation =
+        std::make_shared<CompositeTransformation>();
+
+    moonOrbitRotation =
+        std::make_shared<Rotation>(
+            0.0f,
+            glm::vec3(0.0f, 0.0f, 1.0f)
+        );
+
+    auto moonOrbit =
+        std::make_shared<CompositeTransformation>();
+
+    moonOrbit->addTransformation(
+        moonOrbitRotation
+    );
+
+    moonOrbit->addTransformation(
+        std::make_shared<Translation>(
+            0.16f,
+            0.0f,
+            0.0f
+        )
+    );
+
+    moonSelfRotation =
+        std::make_shared<Rotation>(
+            0.0f,
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+    moonTransformation->addTransformation(
+        earthOrbit
+    );
+
+    moonTransformation->addTransformation(
+        moonOrbit
+    );
+
+    moonTransformation->addTransformation(
+        moonSelfRotation
+    );
+
+    moonTransformation->addTransformation(
+        std::make_shared<Scale>(
+            0.035f,
+            0.035f,
+            0.035f
+        )
+    );
+
+    moonObject->setTransformation(
+        moonTransformation
+    );
+
+    scene5->addObject(
+        moonObject
+    );
+
+
+    activeScene = scene1;
 }
 
 void Application::run()
 {
-	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
-	while (!glfwWindowShouldClose(window))
-	{
-		// Scene switching
-		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-			activeScene = scene1;
+    while (!glfwWindowShouldClose(window))
+    {
+        // Scene switching
+        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+            activeScene = scene1;
 
-		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-			activeScene = scene2;
+        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+            activeScene = scene2;
 
-		if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-			activeScene = scene3;
+        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+            activeScene = scene3;
 
-		if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-			activeScene = scene4;
+        if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+            activeScene = scene4;
 
-
-		// Translation
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			moveX -= 0.01f;
-
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			moveX += 0.01f;
-
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-			moveY += 0.01f;
-
-		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			moveY -= 0.01f;
-
-		if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-			moveZ += 0.01f;
-
-		if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-			moveZ -= 0.01f;
+        if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+            activeScene = scene5;
 
 
-		// Scale
-		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-			objectScale += 0.01f;
+        // Translation X
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+            moveX -= 0.01f;
 
-		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-		{
-			objectScale -= 0.01f;
-
-			if (objectScale < 0.1f)
-				objectScale = 0.1f;
-		}
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+            moveX += 0.01f;
 
 
-		// Rotation around X
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			rotationX += 0.02f;
+        // Translation Y
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+            moveY += 0.01f;
 
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			rotationX -= 0.02f;
-
-
-		// Rotation around Y
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			rotationY += 0.02f;
-
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			rotationY -= 0.02f;
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+            moveY -= 0.01f;
 
 
-		// Rotation around Z
-		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-			rotationZ += 0.02f;
+        // Translation Z
+        if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
+            moveZ += 0.01f;
 
-		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-			rotationZ -= 0.02f;
-
-
-		// Reset transformations
-		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-		{
-			moveX = 0.0f;
-			moveY = 0.0f;
-			moveZ = 0.0f;
-
-			objectScale = 0.8f;
-
-			rotationX = 0.0f;
-			rotationY = 0.0f;
-			rotationZ = 0.0f;
-		}
+        if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
+            moveZ -= 0.01f;
 
 
-		// Update login model in scene 4
-		scene4->setObjectTransform(
-			0,
-			moveX,
-			moveY,
-			moveZ,
-			objectScale,
-			rotationX,
-			rotationY,
-			rotationZ
-		);
+        // Scale
+        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+            objectScale += 0.01f;
+
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+        {
+            objectScale -= 0.01f;
+
+            if (objectScale < 0.1f)
+                objectScale = 0.1f;
+        }
 
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // Rotation X
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            rotationX += 0.02f;
 
-		activeScene->draw();
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            rotationX -= 0.02f;
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
+        // Rotation Y
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            rotationY += 0.02f;
 
-	exit(EXIT_SUCCESS);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            rotationY -= 0.02f;
+
+
+        // Rotation Z
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+            rotationZ += 0.02f;
+
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            rotationZ -= 0.02f;
+
+
+        // Reset
+        if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+        {
+            moveX = 0.0f;
+            moveY = 0.0f;
+            moveZ = 0.0f;
+
+            objectScale = 0.8f;
+
+            rotationX = 0.0f;
+            rotationY = 0.0f;
+            rotationZ = 0.0f;
+        }
+
+
+        // Update transformations directly
+        loginTranslation->setTranslation(
+            moveX,
+            moveY,
+            moveZ
+        );
+
+        loginRotationX->setAngle(
+            rotationX
+        );
+
+        loginRotationY->setAngle(
+            rotationY
+        );
+
+        loginRotationZ->setAngle(
+            rotationZ
+        );
+
+        loginScale->setScale(
+            objectScale,
+            objectScale,
+            objectScale
+        );
+
+        // Solar system animation
+        float time = static_cast<float>(glfwGetTime());
+
+        sunRotation->setAngle(
+            time * 0.3f
+        );
+
+        earthOrbitRotation->setAngle(
+            time * 0.5f
+        );
+
+        earthSelfRotation->setAngle(
+            time * 2.0f
+        );
+
+        moonOrbitRotation->setAngle(
+            time * 2.0f
+        );
+
+        moonSelfRotation->setAngle(
+            time * 1.5f
+        );
+
+
+        glClear(
+            GL_COLOR_BUFFER_BIT |
+            GL_DEPTH_BUFFER_BIT
+        );
+
+        activeScene->draw();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    exit(EXIT_SUCCESS);
 }
