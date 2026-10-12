@@ -5,12 +5,16 @@
 
 #pragma once
 
+#include "Camera.h"
+
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 
+class Camera;
 class ShaderProgram {
 private:
 	GLuint shaderProgram;
+	Camera* camera;
 
 	GLuint createShaderFromFile(
 		GLenum shaderType,
@@ -18,7 +22,7 @@ private:
 	);
 
 public:
-	ShaderProgram(const char* vertexFile, const char* fragmentFile);
+	ShaderProgram(const char* vertexFile, const char* fragmentFile, Camera* camera);
 	void use();
 	void setUniform(const char* name, float value);
 	void setUniform(const char* name, int value);

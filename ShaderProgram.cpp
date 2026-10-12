@@ -4,6 +4,7 @@
  */
 
 #include "ShaderProgram.h"
+#include "Camera.h"
 
 #include "glm/gtc/type_ptr.hpp"
 
@@ -60,7 +61,8 @@ GLuint ShaderProgram::createShaderFromFile(
 
 ShaderProgram::ShaderProgram(
 	const char* vertexFile,
-	const char* fragmentFile
+	const char* fragmentFile,
+	Camera* camera
 ) {
 	// Create and compile the vertex and fragment shaders
 	GLuint vertexShader = createShaderFromFile(GL_VERTEX_SHADER, vertexFile);
@@ -71,6 +73,8 @@ ShaderProgram::ShaderProgram(
 	glAttachShader(shaderProgram, fragmentShader);
 	glAttachShader(shaderProgram, vertexShader);
 	glLinkProgram(shaderProgram);
+
+	this->camera = camera;
 }
 
 void ShaderProgram::use() {

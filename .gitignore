@@ -6,3 +6,8 @@ glad/
 glfw-3.5.1.bin.WIN64/
 x64/
 zpg_projekt/
+zpg-project.sln
+zpg-project.vcxproj
+zpg-project.vcxproj.filters
+zpg-project.vcxproj.user
+zpg-project/
