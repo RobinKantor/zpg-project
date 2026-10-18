@@ -35,6 +35,20 @@ void DrawableObject::draw()
         modelMatrix
     );
 
+    shaderProgram->setUniform("colorMode", colorMode);
+    shaderProgram->setUniform("objectColor", color.x, color.y, color.z);
+
     shaderProgram->use();
     model->draw();
+}
+
+void DrawableObject::setColor(const glm::vec3& color)
+{
+    this->color = color;
+    colorMode = 1;
+}
+
+void DrawableObject::setColorMode(int mode)
+{
+    colorMode = mode;
 }

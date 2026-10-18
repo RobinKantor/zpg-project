@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "Camera.h"
+#include "CameraObserver.h"
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 
 class Camera;
-class ShaderProgram {
+class ShaderProgram : public CameraObserver {
 private:
 	GLuint shaderProgram;
 	Camera* camera;
@@ -23,6 +23,8 @@ private:
 
 public:
 	ShaderProgram(const char* vertexFile, const char* fragmentFile, Camera* camera);
+	~ShaderProgram() override;
+	void updateCamera(const Camera& camera) override;
 	void use();
 	void setUniform(const char* name, float value);
 	void setUniform(const char* name, int value);

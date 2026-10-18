@@ -6,164 +6,106 @@
 #include "ShaderProgram.h"
 #include "Camera.h"
 
-#include "glm/gtc/type_ptr.hpp"
+#include <glm/gtc/type_ptr.hpp>
 
+#include <cstdlib>
 #include <fstream>
-#include <string>
-#include <iterator>
 #include <iostream>
+#include <iterator>
+#include <string>
 
-GLuint ShaderProgram::createShaderFromFile(
-	GLenum shaderType,
-	const char* shaderFile
-) {
-	// Creates an empty shader
-	GLuint shaderID = glCreateShader(shaderType);
+GLuint ShaderProgram::createShaderFromFile(GLenum shaderType, const char* shaderFile)
+{
+    std::ifstream file(shaderFile);
+    if (!file.is_open())
+    {
+        std::cerr << "Unable to open shader: " << shaderFile << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 
-	if (shaderID == 0)
-	{
-		std::cout << "Unable to create shader" << std::endl;
-		exit(EXIT_FAILURE);
-	}
+    std::string shaderCode((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    const char* source = shaderCode.c_str();
+    GLuint shader = glCreateShader(shaderType);
+    glShaderSource(shader, 1, &source, nullptr);
+    glCompileShader(shader);
 
-	//Loading the contents of a file into a variable
-	std::ifstream file(shaderFile);
-	if (!file.is_open())
-	{
-		std::cout << "Unable to open file " << shaderFile << std::endl;
-		glDeleteShader(shaderID);
-		exit(-1);
-	}
-	std::string shaderCode((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    GLint success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        char infoLog[1024];
+        glGetShaderInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
+        std::cerr << shaderFile << ": " << infoLog << std::endl;
+        glDeleteShader(shader);
+        std::exit(EXIT_FAILURE);
+    }
 
-	// Set the shader source code
-	const char* source = shaderCode.c_str();
-	glShaderSource(shaderID, 1, &source, nullptr);
-
-	// Compile the shader source code
-	glCompileShader(shaderID);
-
-	// Check specialization/compilation status
-	GLint success;
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		char infoLog[1024];
-		glGetShaderInfoLog(shaderID, sizeof(infoLog), nullptr, infoLog);
-		std::cout
-			<< "Shader failed:\n"
-			<< infoLog << std::endl;
-		glDeleteShader(shaderID);
-		exit(1);
-	}
-	return shaderID;
+    return shader;
 }
 
-ShaderProgram::ShaderProgram(
-	const char* vertexFile,
-	const char* fragmentFile,
-	Camera* camera
-) {
-	// Create and compile the vertex and fragment shaders
-	GLuint vertexShader = createShaderFromFile(GL_VERTEX_SHADER, vertexFile);
-	GLuint fragmentShader = createShaderFromFile(GL_FRAGMENT_SHADER, fragmentFile);
+ShaderProgram::ShaderProgram(const char* vertexFile, const char* fragmentFile, Camera* camera)
+    : camera(camera)
+{
+    GLuint vertexShader = createShaderFromFile(GL_VERTEX_SHADER, vertexFile);
+    GLuint fragmentShader = createShaderFromFile(GL_FRAGMENT_SHADER, fragmentFile);
 
-	//Create and link the shader program 
-	this->shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, fragmentShader);
-	glAttachShader(shaderProgram, vertexShader);
-	glLinkProgram(shaderProgram);
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
-	this->camera = camera;
+    GLint success;
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        char infoLog[1024];
+        glGetProgramInfoLog(shaderProgram, sizeof(infoLog), nullptr, infoLog);
+        std::cerr << "Shader link failed: " << infoLog << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+
+    camera->attach(this);
 }
 
-void ShaderProgram::use() {
-	glUseProgram(this->shaderProgram);
+ShaderProgram::~ShaderProgram()
+{
+    camera->detach(this);
+    glDeleteProgram(shaderProgram);
+}
+
+void ShaderProgram::updateCamera(const Camera& camera)
+{
+    setUniform("viewMatrix", camera.getViewMatrix());
+    setUniform("projectionMatrix", camera.getProjectionMatrix());
+}
+
+void ShaderProgram::use()
+{
+    glUseProgram(shaderProgram);
 }
 
 void ShaderProgram::setUniform(const char* name, float value)
 {
-	glUseProgram(shaderProgram);
-
-	GLint location = glGetUniformLocation(shaderProgram, name);
-
-	if (location == -1)
-	{
-		std::cout << "Uniform variable not found: " << name << std::endl;
-		glUseProgram(0);
-		return;
-	}
-
-	glUniform1f(location, value);
-
-	glUseProgram(0);
-}
-
-void ShaderProgram::setUniform(const char* name, float x, float y, float z)
-{
-	glUseProgram(shaderProgram);
-
-	GLint location = glGetUniformLocation(shaderProgram, name);
-
-	if (location == -1)
-	{
-		std::cout << "Uniform variable not found: " << name << std::endl;
-		glUseProgram(0);
-		return;
-	}
-
-	glUniform3f(location, x, y, z);
-
-	glUseProgram(0);
+    use();
+    glUniform1f(glGetUniformLocation(shaderProgram, name), value);
 }
 
 void ShaderProgram::setUniform(const char* name, int value)
 {
-	glUseProgram(shaderProgram);
-
-	GLint location = glGetUniformLocation(shaderProgram, name);
-
-	if (location == -1)
-	{
-		std::cout << "Uniform variable not found: " << name << std::endl;
-		glUseProgram(0);
-		return;
-	}
-
-	glUniform1i(location, value);
-
-	glUseProgram(0);
+    use();
+    glUniform1i(glGetUniformLocation(shaderProgram, name), value);
 }
 
-void ShaderProgram::setUniform(
-	const char* name,
-	const glm::mat4& matrix
-)
+void ShaderProgram::setUniform(const char* name, float x, float y, float z)
 {
-	glUseProgram(shaderProgram);
+    use();
+    glUniform3f(glGetUniformLocation(shaderProgram, name), x, y, z);
+}
 
-	GLint location = glGetUniformLocation(
-		shaderProgram,
-		name
-	);
-
-	if (location == -1)
-	{
-		std::cout
-			<< "Uniform variable not found: "
-			<< name
-			<< std::endl;
-
-		glUseProgram(0);
-		return;
-	}
-
-	glUniformMatrix4fv(
-		location,
-		1,
-		GL_FALSE,
-		glm::value_ptr(matrix)
-	);
-
-	glUseProgram(0);
+void ShaderProgram::setUniform(const char* name, const glm::mat4& matrix)
+{
+    use();
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name), 1, GL_FALSE, glm::value_ptr(matrix));
 }

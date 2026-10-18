@@ -7,6 +7,14 @@
 
 #include <glad/gl.h>
 
+enum class VertexFormat
+{
+	PositionColor,
+	PositionNormal,
+	PositionColorNormal,
+	PositionNormalColor
+};
+
 class Model {
 private:
 	GLuint VBO;
@@ -18,8 +26,9 @@ public:
 		const float* points,
 		int size,
 		int vertexCount,
-		int valuesPerVertex = 6
+		VertexFormat format = VertexFormat::PositionNormal
 	);
+	~Model();
 
 	void draw();
 };

@@ -5,75 +5,55 @@
 
 #include "Model.h"
 
-
-Model::Model(
-    const float* points,
-    int size,
-    int vertexCount,
-    int valuesPerVertex
-)
+Model::Model(const float* points, int size, int vertexCount, VertexFormat format)
+    : vertexCount(vertexCount)
 {
-    this->vertexCount = vertexCount;
-
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        size,
-        points,
-        GL_STATIC_DRAW
-    );
+    bool hasColor = format != VertexFormat::PositionNormal;
+    bool hasNormal = format != VertexFormat::PositionColor;
+    int valuesPerVertex = hasColor && hasNormal ? 9 : 6;
+    int colorOffset = format == VertexFormat::PositionNormalColor ? 6 : 3;
+    int normalOffset = format == VertexFormat::PositionColorNormal ? 6 : 3;
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
-
+    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, size, points, GL_STATIC_DRAW);
 
-    // Position
-    glVertexAttribPointer(
-        0,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        valuesPerVertex * sizeof(float),
-        (void*)0
-    );
-
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    // Color / second vec3
-    glVertexAttribPointer(
-        1,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        valuesPerVertex * sizeof(float),
-        (void*)(3 * sizeof(float))
-    );
-
-    glEnableVertexAttribArray(1);
-
-    // Normal - only models with 9 values per vertex
-    if (valuesPerVertex >= 9)
+    if (hasColor)
     {
-        glVertexAttribPointer(
-            2,
-            3,
-            GL_FLOAT,
-            GL_FALSE,
-            valuesPerVertex * sizeof(float),
-            (void*)(6 * sizeof(float))
-        );
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float),
+            reinterpret_cast<void*>(colorOffset * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    }
+    else
+        glVertexAttrib3f(1, 1.0f, 1.0f, 1.0f);
 
+    if (hasNormal)
+    {
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float),
+            reinterpret_cast<void*>(normalOffset * sizeof(float)));
         glEnableVertexAttribArray(2);
     }
+    else
+        glVertexAttrib3f(2, 0.0f, 1.0f, 0.0f);
 
     glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Model::draw() {
-	glBindVertexArray(VAO);
+Model::~Model()
+{
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
+}
 
-	// Draw a triangles
-	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+void Model::draw()
+{
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+    glBindVertexArray(0);
 }

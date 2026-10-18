@@ -18,6 +18,8 @@ private:
     ShaderProgram* shaderProgram;
 
     std::shared_ptr<Transformation> transformation;
+    int colorMode = 0;
+    glm::vec3 color = glm::vec3(1.0f);
 
 public:
     DrawableObject(
@@ -30,4 +32,6 @@ public:
     );
 
     void draw();
+    void setColor(const glm::vec3& color);
+    void setColorMode(int mode);
 };

@@ -6,15 +6,15 @@
 #include "Application.h"
 
 
-int main(void)
+int main()
 {
-    Application* app = new Application();
+    Application app;
 
-    app->initialization();
-    app->createShaders();
-    app->createModels();
-    app->createScenes();
-    app->run();
+    app.initialization();
+    app.createShaders();
+    app.createModels();
+    app.createScenes();
+    app.run();
 
     return 0;
 }

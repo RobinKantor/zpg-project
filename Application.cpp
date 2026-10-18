@@ -16,127 +16,105 @@
 #include "Models/earth.h"
 #include "Models/sun.h"
 #include "Models/moon.h"
+#include "Models/clock.h"
+#include "Models/plain.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <memory>
+#include <glm/gtc/constants.hpp>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <random>
 
+Application::~Application()
+{
+    delete scene1;
+    delete scene2;
+    delete scene3;
+    delete scene4;
+    delete scene5;
+    delete scene6;
 
-void Application::initialization() {
+    delete model1;
+    delete sphereModel;
+    delete treeModel;
+    delete bushModel;
+    delete loginModel;
+    delete earthModel;
+    delete sunModel;
+    delete moonModel;
+    delete clock;
+    delete groundModel;
 
-	// Initialize GLFW
-	if (!glfwInit())
-		exit(EXIT_FAILURE);
+    delete shader1;
+    delete shader2;
+    delete clockShader;
 
-	//Initialization of a specific version
-	/*
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE,
-	GLFW_OPENGL_CORE_PROFILE);  //*/
-
-
-	window = glfwCreateWindow(800, 600, "ZPG", NULL, NULL);
-	if (!window)
-	{
-		glfwTerminate();
-		exit(EXIT_FAILURE);
-	}
-
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
-
-	// Initialize GLAD and load OpenGL function pointers
-	if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress))
-	{
-		printf("GLAD initialization failed\n");
-		exit(EXIT_FAILURE);
-	}
-
-	// Get version info
-	printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
-	printf("Vendor %s\n", glGetString(GL_VENDOR));
-	printf("Renderer %s\n", glGetString(GL_RENDERER));
-	printf("GLSL %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-	int major, minor, revision;
-	glfwGetVersion(&major, &minor, &revision);
-	printf("Using GLFW %i.%i.%i\n", major, minor, revision);
+    if (window)
+        glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
-void Application::createShaders() {
-	shader1 = new ShaderProgram(
-		"shaders/basic.vert",
-		"shaders/basic.frag"
-	);
+void Application::initialization()
+{
+    if (!glfwInit())
+        std::exit(EXIT_FAILURE);
 
-	shader2 = new ShaderProgram(
-		"shaders/basic.vert",
-		"shaders/basic2.frag"
-	);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    window = glfwCreateWindow(800, 600, "ZPG", nullptr, nullptr);
+    if (!window)
+    {
+        glfwTerminate();
+        std::exit(EXIT_FAILURE);
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+
+    if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress)))
+    {
+        std::fprintf(stderr, "GLAD initialization failed\n");
+        std::exit(EXIT_FAILURE);
+    }
+
+    std::printf("OpenGL: %s\n", glGetString(GL_VERSION));
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, framebufferCallback);
+    glfwSetKeyCallback(window, keyCallback);
+
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    framebufferCallback(window, width, height);
+}
+
+void Application::createShaders()
+{
+    shader1 = new ShaderProgram("Shaders/basic.vert", "Shaders/basic.frag", &camera);
+    shader2 = new ShaderProgram("Shaders/basic.vert", "Shaders/basic2.frag", &camera);
+    clockShader = new ShaderProgram("Shaders/clock.vert", "Shaders/basic.frag", &camera);
 }
 
 void Application::createModels()
 {
-	float points1[] = {
-		-0.7f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
-		-0.3f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
-		-0.9f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f
-	};
+    float points1[] = {
+        -0.7f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
+        -0.3f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
+        -0.9f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f
+    };
 
-	float points2[] = {
-		 0.7f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
-		 0.9f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
-		 0.3f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f
-	};
-
-	model1 = new Model(points1, sizeof(points1), 3);
-	model2 = new Model(points2, sizeof(points2), 3);
-
-	sphereModel = new Model(sphere, sizeof(sphere), 2880);
-
-    treeModel = new Model(
-        tree,
-        sizeof(tree),
-        sizeof(tree) / (6 * sizeof(float))
-    );
-
-    bushModel = new Model(
-        bushes,
-        sizeof(bushes),
-        sizeof(bushes) / (6 * sizeof(float))
-    );
-
-	loginModel = new Model(
-		loginKAN0310,
-		sizeof(loginKAN0310),
-		KAN0310_VERTEX_COUNT
-	);
-
-    sunModel = new Model(
-        sun,
-        sizeof(sun),
-        11520,
-        9
-    );
-
-    earthModel = new Model(
-        earth,
-        sizeof(earth),
-        11520,
-        9
-    );
-
-    moonModel = new Model(
-        moon,
-        sizeof(moon),
-        11520,
-        9
-    );
+    model1 = new Model(points1, sizeof(points1), 3, VertexFormat::PositionColor);
+    sphereModel = new Model(sphere, sizeof(sphere), sizeof(sphere) / (6 * sizeof(float)));
+    treeModel = new Model(tree, sizeof(tree), sizeof(tree) / (6 * sizeof(float)));
+    bushModel = new Model(bushes, sizeof(bushes), sizeof(bushes) / (6 * sizeof(float)));
+    loginModel = new Model(loginKAN0310, sizeof(loginKAN0310), KAN0310_VERTEX_COUNT);
+    sunModel = new Model(sun, sizeof(sun), sizeof(sun) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
+    earthModel = new Model(earth, sizeof(earth), sizeof(earth) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
+    moonModel = new Model(moon, sizeof(moon), sizeof(moon) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
+    clock = new Model(clockModel, sizeof(clockModel), static_cast<int>(vertexCount), VertexFormat::PositionNormalColor);
+    groundModel = new Model(plain, sizeof(plain), 6);
 }
-
 void Application::createScenes()
 {
     scene1 = new Scene();
@@ -144,11 +122,7 @@ void Application::createScenes()
     scene3 = new Scene();
     scene4 = new Scene();
     scene5 = new Scene();
-
-
-    // ---------------------------------------------------------
-    // Scene 1 - triangle
-    // ---------------------------------------------------------
+    scene6 = new Scene();
 
     auto triangle1 =
         std::make_shared<DrawableObject>(
@@ -213,9 +187,6 @@ void Application::createScenes()
     scene1->addObject(
         triangle2
     );
-
-
-    // Login signature
     auto scene1Login =
         std::make_shared<DrawableObject>(
             loginModel,
@@ -249,11 +220,6 @@ void Application::createScenes()
         scene1Login
     );
 
-
-    // ---------------------------------------------------------
-    // Scene 2 - sphere
-    // ---------------------------------------------------------
-
     auto sphereObject =
         std::make_shared<DrawableObject>(
             sphereModel,
@@ -271,6 +237,7 @@ void Application::createScenes()
         )
     );
 
+    sphereObject->setColorMode(3);
     sphereObject->setTransformation(
         sphereTransformation
     );
@@ -278,9 +245,6 @@ void Application::createScenes()
     scene2->addObject(
         sphereObject
     );
-
-
-    // Login signature
     auto scene2Login =
         std::make_shared<DrawableObject>(
             loginModel,
@@ -314,189 +278,83 @@ void Application::createScenes()
         scene2Login
     );
 
+    auto ground = std::make_shared<DrawableObject>(groundModel, shader1);
 
-    // ---------------------------------------------------------
-    // Scene 3 - forest
-    // ---------------------------------------------------------
+    ground->setColor(glm::vec3(0.1f, 0.3f, 0.1f));
+    ground->setTransformation(
+        std::make_shared<Scale>(30.0f, 1.0f, 30.0f)
+    );
 
-    // trees
-    std::random_device rd;
-    std::mt19937 generator(rd());
+    scene3->addObject(ground);
 
-    std::uniform_real_distribution<float> treeX(-0.85f, 0.55f);
-    std::uniform_real_distribution<float> treeY(-0.05f, 0.50f);
-    std::uniform_real_distribution<float> treeScale(0.06f, 0.085f);
-    std::uniform_real_distribution<float> treeRotation(-0.4f, 0.4f);
+    std::random_device random;
+    std::mt19937 generator(random());
+    std::uniform_real_distribution<float> treePosition(-20.0f, 20.0f);
+    std::uniform_real_distribution<float> treeScale(0.7f, 1.15f);
+    std::uniform_real_distribution<float> rotation(0.0f, glm::two_pi<float>());
 
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < 74; i++)
     {
-        auto treeObject =
-            std::make_shared<DrawableObject>(
-                treeModel,
-                shader1
-            );
-
-        auto transformation =
-            std::make_shared<CompositeTransformation>();
-
-        transformation->addTransformation(
-            std::make_shared<Translation>(
-                treeX(generator),
-                treeY(generator),
-                0.0f
-            )
-        );
-
-        transformation->addTransformation(
-            std::make_shared<Rotation>(
-                treeRotation(generator),
-                glm::vec3(0.0f, 1.0f, 0.0f)
-            )
-        );
-
+        auto treeObject = std::make_shared<DrawableObject>(treeModel, shader1);
+        auto transformation = std::make_shared<CompositeTransformation>();
+        float x = treePosition(generator);
+        float z = treePosition(generator);
         float scale = treeScale(generator);
 
-        transformation->addTransformation(
-            std::make_shared<Scale>(
-                scale,
-                scale,
-                scale
-            )
-        );
-
-        treeObject->setTransformation(
-            transformation
-        );
-
-        scene3->addObject(
-            treeObject
-        );
+        transformation->addTransformation(std::make_shared<Translation>(x, 0.0f, z));
+        transformation->addTransformation(std::make_shared<Rotation>(rotation(generator), glm::vec3(0.0f, 1.0f, 0.0f)));
+        transformation->addTransformation(std::make_shared<Scale>(scale, scale, scale));
+        treeObject->setTransformation(transformation);
+        treeObject->setColorMode(2);
+        scene3->addObject(treeObject);
     }
 
-    // bushes
-    std::uniform_real_distribution<float> bushX(-0.90f, 0.90f);
-    std::uniform_real_distribution<float> bushY(-0.65f, -0.15f);
-    std::uniform_real_distribution<float> bushScale(0.40f, 0.65f);
-    std::uniform_real_distribution<float> bushRotation(-0.5f, 0.5f);
+    std::uniform_real_distribution<float> bushPosition(-23.0f, 23.0f);
+    std::uniform_real_distribution<float> bushScale(1.5f, 3.0f);
 
     for (int i = 0; i < 15; i++)
     {
-        auto bushObject =
-            std::make_shared<DrawableObject>(
-                bushModel,
-                shader1
-            );
+        auto bushObject = std::make_shared<DrawableObject>(bushModel, shader1);
+        auto transformation = std::make_shared<CompositeTransformation>();
+        float scale = bushScale(generator);
 
-        auto transformation =
-            std::make_shared<CompositeTransformation>();
+        transformation->addTransformation(std::make_shared<Translation>(bushPosition(generator), 0.0f, bushPosition(generator)));
+        transformation->addTransformation(std::make_shared<Rotation>(rotation(generator), glm::vec3(0.0f, 1.0f, 0.0f)));
+        transformation->addTransformation(std::make_shared<Scale>(scale, scale, scale));
+        bushObject->setTransformation(transformation);
+        bushObject->setColor(glm::vec3(0.16f, 0.48f, 0.08f));
+        scene3->addObject(bushObject);
+    }
 
+    glm::vec3 clockPositions[] = {
+        glm::vec3(-3.0f, 1.7f, 16.0f),
+        glm::vec3(3.0f, 1.7f, 9.0f)
+    };
+
+    for (const glm::vec3& position : clockPositions) { 
+        auto clockObject = std::make_shared<DrawableObject>(clock, clockShader);
+        auto transformation = std::make_shared<CompositeTransformation>();
+        
         transformation->addTransformation(
             std::make_shared<Translation>(
-                bushX(generator),
-                bushY(generator),
-                0.0f
+                position.x, position.y, position.z
             )
         );
 
         transformation->addTransformation(
             std::make_shared<Rotation>(
-                bushRotation(generator),
+                glm::radians(180.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f)
             )
         );
 
-        float scale = bushScale(generator);
-
         transformation->addTransformation(
-            std::make_shared<Scale>(
-                scale,
-                scale,
-                scale
-            )
+            std::make_shared<Scale>(-1.0f, 1.0f, 1.0f)
         );
 
-        bushObject->setTransformation(
-            transformation
-        );
-
-        scene3->addObject(
-            bushObject
-        );
+        clockObject->setTransformation(transformation);
+        scene3->addObject(clockObject);
     }
-
-    // Sun
-    auto sun =
-        std::make_shared<DrawableObject>(
-            sphereModel,
-            shader2
-        );
-
-    auto sunTransformation =
-        std::make_shared<CompositeTransformation>();
-
-    sunTransformation->addTransformation(
-        std::make_shared<Translation>(
-            0.75f,
-            0.75f,
-            0.0f
-        )
-    );
-
-    sunTransformation->addTransformation(
-        std::make_shared<Scale>(
-            0.15f,
-            0.15f,
-            0.15f
-        )
-    );
-
-    sun->setTransformation(
-        sunTransformation
-    );
-
-    scene3->addObject(
-        sun
-    );
-
-
-    // Login signature
-    auto scene3Login =
-        std::make_shared<DrawableObject>(
-            loginModel,
-            shader2
-        );
-
-    auto scene3LoginTransformation =
-        std::make_shared<CompositeTransformation>();
-
-    scene3LoginTransformation->addTransformation(
-        std::make_shared<Translation>(
-            0.72f,
-            -0.82f,
-            -0.1f
-        )
-    );
-
-    scene3LoginTransformation->addTransformation(
-        std::make_shared<Scale>(
-            0.20f,
-            0.20f,
-            0.20f
-        )
-    );
-
-    scene3Login->setTransformation(
-        scene3LoginTransformation
-    );
-
-    scene3->addObject(
-        scene3Login
-    );
-
-
-    // ---------------------------------------------------------
-    // Scene 4 - controllable login
-    // ---------------------------------------------------------
 
     auto loginObject =
         std::make_shared<DrawableObject>(
@@ -569,10 +427,6 @@ void Application::createScenes()
     scene4->addObject(
         loginObject
     );
-
-    // ---------------------------------------------------------
-    // Scene 5 - Solar system
-    // ---------------------------------------------------------
 
     auto sunObject =
         std::make_shared<DrawableObject>(
@@ -734,171 +588,163 @@ void Application::createScenes()
     );
 
 
-    activeScene = scene1;
+    auto clockObject = std::make_shared<DrawableObject>(clock, clockShader);
+    clockObject->setTransformation(std::make_shared<Scale>(-1.0f, 1.0f, 1.0f));
+    scene6->addObject(clockObject);
+
+    setScene(3);
+}
+
+void Application::framebufferCallback(GLFWwindow* window, int width, int height)
+{
+    auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+    glViewport(0, 0, width, height);
+    app->camera.resize(width, height);
+}
+
+void Application::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (action != GLFW_PRESS)
+        return;
+
+    auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_6)
+        app->setScene(key - GLFW_KEY_1 + 1);
+    else if (key == GLFW_KEY_ESCAPE)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    else if (key == GLFW_KEY_R && app->activeSceneNumber == 4)
+    {
+        app->moveX = app->moveY = app->moveZ = 0.0f;
+        app->rotationX = app->rotationY = app->rotationZ = 0.0f;
+        app->objectScale = 0.8f;
+    }
+}
+
+void Application::setScene(int number)
+{
+    Scene* scenes[] = { scene1, scene2, scene3, scene4, scene5, scene6 };
+    activeScene = scenes[number - 1];
+    activeSceneNumber = number;
+    resetCamera();
+
+}
+
+void Application::resetCamera()
+{
+    if (activeSceneNumber == 3)
+        camera.setPose(glm::vec3(0.0f, 1.7f, 23.0f), glm::half_pi<float>(), -glm::half_pi<float>());
+    else if (activeSceneNumber == 6)
+        camera.setPose(glm::vec3(0.0f, 0.0f, -3.0f), glm::half_pi<float>(), glm::half_pi<float>());
+    else
+        camera.setPose(glm::vec3(0.0f, 0.0f, 2.0f), glm::half_pi<float>(), -glm::half_pi<float>());
+
+    firstMouse = true;
+}
+
+void Application::processInput(float deltaTime)
+{
+    bool captured = glfwGetWindowAttrib(window, GLFW_FOCUSED)
+        && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+
+    if (captured != mouseCaptured)
+    {
+        mouseCaptured = captured;
+        firstMouse = true;
+    }
+
+    if (mouseCaptured)
+    {
+        double x, y;
+        glfwGetCursorPos(window, &x, &y);
+        if (!firstMouse)
+            camera.rotate(static_cast<float>(x - lastMouseX), static_cast<float>(y - lastMouseY));
+
+        firstMouse = false;
+        lastMouseX = x;
+        lastMouseY = y;
+    }
+
+    if (!glfwGetWindowAttrib(window, GLFW_FOCUSED))
+        return;
+
+    if (activeSceneNumber == 4)
+    {
+        moveX += (keyPressed(GLFW_KEY_RIGHT) - keyPressed(GLFW_KEY_LEFT)) * deltaTime;
+        moveY += (keyPressed(GLFW_KEY_UP) - keyPressed(GLFW_KEY_DOWN)) * deltaTime;
+        moveZ += (keyPressed(GLFW_KEY_PAGE_UP) - keyPressed(GLFW_KEY_PAGE_DOWN)) * deltaTime;
+        objectScale = glm::max(0.1f, objectScale + (keyPressed(GLFW_KEY_Z) - keyPressed(GLFW_KEY_X)) * deltaTime);
+        rotationX += (keyPressed(GLFW_KEY_W) - keyPressed(GLFW_KEY_S)) * deltaTime;
+        rotationY += (keyPressed(GLFW_KEY_A) - keyPressed(GLFW_KEY_D)) * deltaTime;
+        rotationZ += (keyPressed(GLFW_KEY_Q) - keyPressed(GLFW_KEY_E)) * deltaTime;
+    }
+    else
+    {
+        glm::vec2 movement(
+            keyPressed(GLFW_KEY_D) - keyPressed(GLFW_KEY_A),
+            keyPressed(GLFW_KEY_W) - keyPressed(GLFW_KEY_S)
+        );
+
+        if (glm::length(movement) > 0.0f)
+        {
+            movement = glm::normalize(movement);
+            float speed = activeSceneNumber == 3 ? 4.0f : 1.5f;
+            camera.move(movement.y * speed * deltaTime, movement.x * speed * deltaTime);
+        }
+    }
+}
+
+bool Application::keyPressed(int key) const
+{
+    return glfwGetKey(window, key) == GLFW_PRESS;
+}
+
+void Application::updateClock()
+{
+    std::time_t time = std::time(nullptr);
+    std::tm localTime{};
+    localtime_s(&localTime, &time);
+
+    float seconds = static_cast<float>(localTime.tm_sec);
+    float minutes = localTime.tm_min + seconds / 60.0f;
+    float hours = (localTime.tm_hour % 12) + minutes / 60.0f;
+
+    clockShader->setUniform("handAngles",
+        -glm::radians(seconds * 6.0f),
+        -glm::radians(minutes * 6.0f),
+        -glm::radians(hours * 30.0f));
 }
 
 void Application::run()
 {
     glEnable(GL_DEPTH_TEST);
+    double previousTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window))
     {
-        // Scene switching
-        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-            activeScene = scene1;
-
-        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-            activeScene = scene2;
-
-        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-            activeScene = scene3;
-
-        if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-            activeScene = scene4;
-
-        if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-            activeScene = scene5;
-
-
-        // Translation X
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-            moveX -= 0.01f;
-
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-            moveX += 0.01f;
-
-
-        // Translation Y
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-            moveY += 0.01f;
-
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-            moveY -= 0.01f;
-
-
-        // Translation Z
-        if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-            moveZ += 0.01f;
-
-        if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-            moveZ -= 0.01f;
-
-
-        // Scale
-        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-            objectScale += 0.01f;
-
-        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-        {
-            objectScale -= 0.01f;
-
-            if (objectScale < 0.1f)
-                objectScale = 0.1f;
-        }
-
-
-        // Rotation X
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            rotationX += 0.02f;
-
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            rotationX -= 0.02f;
-
-
-        // Rotation Y
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            rotationY += 0.02f;
-
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            rotationY -= 0.02f;
-
-
-        // Rotation Z
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-            rotationZ += 0.02f;
-
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-            rotationZ -= 0.02f;
-
-
-        // Reset
-        if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        {
-            moveX = 0.0f;
-            moveY = 0.0f;
-            moveZ = 0.0f;
-
-            objectScale = 0.8f;
-
-            rotationX = 0.0f;
-            rotationY = 0.0f;
-            rotationZ = 0.0f;
-        }
-
-
-        // Update transformations directly
-        loginTranslation->setTranslation(
-            moveX,
-            moveY,
-            moveZ
-        );
-
-        loginRotationX->setAngle(
-            rotationX
-        );
-
-        loginRotationY->setAngle(
-            rotationY
-        );
-
-        loginRotationZ->setAngle(
-            rotationZ
-        );
-
-        loginScale->setScale(
-            objectScale,
-            objectScale,
-            objectScale
-        );
-
-        // Solar system animation
-        float time = static_cast<float>(glfwGetTime());
-
-        sunRotation->setAngle(
-            time * 0.3f
-        );
-
-        earthOrbitRotation->setAngle(
-            time * 0.5f
-        );
-
-        earthSelfRotation->setAngle(
-            time * 2.0f
-        );
-
-        moonOrbitRotation->setAngle(
-            time * 2.0f
-        );
-
-        moonSelfRotation->setAngle(
-            time * 1.5f
-        );
-
-
-        glClear(
-            GL_COLOR_BUFFER_BIT |
-            GL_DEPTH_BUFFER_BIT
-        );
-
-        activeScene->draw();
-
-        glfwSwapBuffers(window);
         glfwPollEvents();
+        double now = glfwGetTime();
+        float deltaTime = glm::min(static_cast<float>(now - previousTime), 0.05f);
+        previousTime = now;
+        processInput(deltaTime);
+
+        loginTranslation->setTranslation(moveX, moveY, moveZ);
+        loginRotationX->setAngle(rotationX);
+        loginRotationY->setAngle(rotationY);
+        loginRotationZ->setAngle(rotationZ);
+        loginScale->setScale(objectScale, objectScale, objectScale);
+
+        float time = static_cast<float>(now);
+        sunRotation->setAngle(time * 0.3f);
+        earthOrbitRotation->setAngle(time * 0.5f);
+        earthSelfRotation->setAngle(time * 2.0f);
+        moonOrbitRotation->setAngle(time * 2.0f);
+        moonSelfRotation->setAngle(time * 1.5f);
+
+        if (activeSceneNumber == 3 || activeSceneNumber == 6)
+            updateClock();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        activeScene->draw();
+        glfwSwapBuffers(window);
     }
-
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
-
-    exit(EXIT_SUCCESS);
 }
