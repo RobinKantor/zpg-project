@@ -7,44 +7,130 @@
     <Filter Include="Shadery" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="Camera.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="CompositeTransformation.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="DrawableObject.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="main.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="Model.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="Rotation.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="Scale.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="Scene.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="ShaderProgram.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClCompile Include="Translation.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
-    <ClInclude Include="Application.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="Camera.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="CameraObserver.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="CompositeTransformation.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="DrawableObject.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="Model.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="Rotation.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="Scale.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="Scene.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="ShaderProgram.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="Transformation.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="Translation.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
-    <ClInclude Include="Models\bushes.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\clock.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\earth.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\gift.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\KAN0310.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\moon.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\plain.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\sphere.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\sun.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\suzi_flat.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\suzi_smooth.h"><Filter>Modely</Filter></ClInclude>
-    <ClInclude Include="Models\tree.h"><Filter>Modely</Filter></ClInclude>
-    <None Include="Shaders\basic.vert"><Filter>Shadery</Filter></None>
-    <None Include="Shaders\basic.frag"><Filter>Shadery</Filter></None>
-    <None Include="Shaders\basic2.frag"><Filter>Shadery</Filter></None>
-    <None Include="Shaders\clock.vert"><Filter>Shadery</Filter></None>
+    <ClCompile Include="Application.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="CompositeTransformation.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawableObject.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="Rotation.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="Scale.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="Translation.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClInclude Include="Application.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraObserver.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="CompositeTransformation.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawableObject.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Rotation.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Scale.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Transformation.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Translation.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\bushes.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\clock.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\earth.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\gift.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\KAN0310.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\moon.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\plain.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\sphere.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\sun.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\suzi_flat.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\suzi_smooth.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <ClInclude Include="Models\tree.h">
+      <Filter>Modely</Filter>
+    </ClInclude>
+    <None Include="Shaders\basic.vert">
+      <Filter>Shadery</Filter>
+    </None>
+    <None Include="Shaders\basic.frag">
+      <Filter>Shadery</Filter>
+    </None>
+    <None Include="Shaders\basic2.frag">
+      <Filter>Shadery</Filter>
+    </None>
+    <None Include="Shaders\clock.vert">
+      <Filter>Shadery</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="light.vert">
+      <Filter>Shadery</Filter>
+    </None>
+    <None Include="light.frag">
+      <Filter>Shadery</Filter>
+    </None>
   </ItemGroup>
 </Project>

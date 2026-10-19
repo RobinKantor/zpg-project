@@ -33,6 +33,7 @@ Application::~Application()
     delete scene4;
     delete scene5;
     delete scene6;
+    delete scene7;
 
     delete model1;
     delete sphereModel;
@@ -94,6 +95,7 @@ void Application::createShaders()
     shader1 = new ShaderProgram("Shaders/basic.vert", "Shaders/basic.frag", &camera);
     shader2 = new ShaderProgram("Shaders/basic.vert", "Shaders/basic2.frag", &camera);
     clockShader = new ShaderProgram("Shaders/clock.vert", "Shaders/basic.frag", &camera);
+    lightShader = new ShaderProgram("Shaders/light.vert", "Shaders/light.frag", &camera);
 }
 
 void Application::createModels()
@@ -123,6 +125,7 @@ void Application::createScenes()
     scene4 = new Scene();
     scene5 = new Scene();
     scene6 = new Scene();
+    scene7 = new Scene();
 
     auto triangle1 =
         std::make_shared<DrawableObject>(
@@ -592,6 +595,35 @@ void Application::createScenes()
     clockObject->setTransformation(std::make_shared<Scale>(-1.0f, 1.0f, 1.0f));
     scene6->addObject(clockObject);
 
+    glm::vec3 shperePositions[] = {
+        glm::vec3(-1.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f)
+    };
+
+    for (const glm::vec3& position : shperePositions) {
+        auto sphereObject = std::make_shared<DrawableObject>(sphereModel, lightShader);
+        auto transformation = std::make_shared<CompositeTransformation>();
+
+        transformation->addTransformation(
+            std::make_shared<Translation>(
+                position.x, position.y, position.z
+            )
+        );
+
+        transformation->addTransformation(
+            std::make_shared<Scale>(
+                0.5,
+                0.5,
+                0.5
+            )
+        );
+
+        sphereObject->setTransformation(transformation);
+        scene7->addObject(sphereObject);
+    }
+
     setScene(3);
 }
 
@@ -608,7 +640,7 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
         return;
 
     auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_6)
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_7)
         app->setScene(key - GLFW_KEY_1 + 1);
     else if (key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -622,7 +654,7 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
 
 void Application::setScene(int number)
 {
-    Scene* scenes[] = { scene1, scene2, scene3, scene4, scene5, scene6 };
+    Scene* scenes[] = { scene1, scene2, scene3, scene4, scene5, scene6, scene7 };
     activeScene = scenes[number - 1];
     activeSceneNumber = number;
     resetCamera();

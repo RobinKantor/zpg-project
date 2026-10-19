@@ -28,6 +28,7 @@ private:
     ShaderProgram* shader1 = nullptr;
     ShaderProgram* shader2 = nullptr;
     ShaderProgram* clockShader = nullptr;
+    ShaderProgram* lightShader = nullptr;
 
     Model* model1 = nullptr;
     Model* sphereModel = nullptr;
@@ -46,6 +47,7 @@ private:
     Scene* scene4 = nullptr;
     Scene* scene5 = nullptr;
     Scene* scene6 = nullptr;
+    Scene* scene7 = nullptr;
     Scene* activeScene = nullptr;
     int activeSceneNumber = 0;
 

@@ -41,7 +41,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\kan0310\Downloads\glad\include;C:\Users\kan0310\Downloads\glad;$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -94,6 +94,8 @@
     <ClInclude Include="Models\tree.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="light.frag" />
+    <None Include="light.vert" />
     <None Include="Shaders\basic.vert" />
     <None Include="Shaders\basic.frag" />
     <None Include="Shaders\basic2.frag" />
