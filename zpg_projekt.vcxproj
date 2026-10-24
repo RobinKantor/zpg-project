@@ -41,7 +41,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Users\kan0310\Downloads\glad\include;C:\Users\kan0310\Downloads\glad;$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -56,6 +56,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="ApplicationScenes.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CompositeTransformation.cpp" />
     <ClCompile Include="DrawableObject.cpp" />
@@ -88,20 +89,35 @@
     <ClInclude Include="Models\moon.h" />
     <ClInclude Include="Models\plain.h" />
     <ClInclude Include="Models\sphere.h" />
+    <ClInclude Include="Models\boeing737.h" />
     <ClInclude Include="Models\sun.h" />
     <ClInclude Include="Models\suzi_flat.h" />
     <ClInclude Include="Models\suzi_smooth.h" />
     <ClInclude Include="Models\tree.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="light.frag" />
-    <None Include="light.vert" />
+
+
     <None Include="Shaders\basic.vert" />
     <None Include="Shaders\basic.frag" />
     <None Include="Shaders\basic2.frag" />
     <None Include="Shaders\clock.vert" />
+    <None Include="Shaders\light.vert" />
+    <None Include="Shaders\ambient.frag" />
+    <None Include="Shaders\lambert.frag" />
+    <None Include="Shaders\phong.frag" />
+    <None Include="Shaders\blinn.frag" />
+    <None Include="Models\Source\B737_nologo.glb" />
+    <None Include="Models\Source\AMVLab_License.txt" />
+    <None Include="Models\Source\B737_attribution.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="CheckShaderLocation" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <MisplacedShader Include="$(ProjectDir)*.vert;$(ProjectDir)*.frag;$(ProjectDir)*.glsl" />
+    </ItemGroup>
+    <Error Condition="'@(MisplacedShader)' != ''" Text="Shader files must be stored in the Shaders directory: @(MisplacedShader)" />
+  </Target>
   <Target Name="CopyRuntimeFiles" AfterTargets="Build">
     <ItemGroup>
       <ShaderToCopy Include="$(ProjectDir)Shaders\*.vert;$(ProjectDir)Shaders\*.frag" />

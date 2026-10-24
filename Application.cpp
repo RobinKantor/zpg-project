@@ -18,12 +18,14 @@
 #include "Models/moon.h"
 #include "Models/clock.h"
 #include "Models/plain.h"
+#include "Models/boeing737.h"
 
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <random>
+
 
 Application::~Application()
 {
@@ -45,10 +47,15 @@ Application::~Application()
     delete moonModel;
     delete clock;
     delete groundModel;
+    delete airplaneModel;
 
     delete shader1;
     delete shader2;
     delete clockShader;
+    delete ambientShader;
+    delete lambertShader;
+    delete phongShader;
+    delete blinnShader;
 
     if (window)
         glfwDestroyWindow(window);
@@ -84,6 +91,7 @@ void Application::initialization()
     glfwSetWindowUserPointer(window, this);
     glfwSetFramebufferSizeCallback(window, framebufferCallback);
     glfwSetKeyCallback(window, keyCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
@@ -95,7 +103,10 @@ void Application::createShaders()
     shader1 = new ShaderProgram("Shaders/basic.vert", "Shaders/basic.frag", &camera);
     shader2 = new ShaderProgram("Shaders/basic.vert", "Shaders/basic2.frag", &camera);
     clockShader = new ShaderProgram("Shaders/clock.vert", "Shaders/basic.frag", &camera);
-    lightShader = new ShaderProgram("Shaders/light.vert", "Shaders/light.frag", &camera);
+    ambientShader = new ShaderProgram("Shaders/light.vert", "Shaders/ambient.frag", &camera);
+    lambertShader = new ShaderProgram("Shaders/light.vert", "Shaders/lambert.frag", &camera);
+    phongShader = new ShaderProgram("Shaders/light.vert", "Shaders/phong.frag", &camera);
+    blinnShader = new ShaderProgram("Shaders/light.vert", "Shaders/blinn.frag", &camera);
 }
 
 void Application::createModels()
@@ -116,517 +127,8 @@ void Application::createModels()
     moonModel = new Model(moon, sizeof(moon), sizeof(moon) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
     clock = new Model(clockModel, sizeof(clockModel), static_cast<int>(vertexCount), VertexFormat::PositionNormalColor);
     groundModel = new Model(plain, sizeof(plain), 6);
+    airplaneModel = new Model(boeing737, sizeof(boeing737), sizeof(boeing737) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
 }
-void Application::createScenes()
-{
-    scene1 = new Scene();
-    scene2 = new Scene();
-    scene3 = new Scene();
-    scene4 = new Scene();
-    scene5 = new Scene();
-    scene6 = new Scene();
-    scene7 = new Scene();
-
-    auto triangle1 =
-        std::make_shared<DrawableObject>(
-            model1,
-            shader1
-        );
-
-    auto transformation1 =
-        std::make_shared<CompositeTransformation>();
-
-    transformation1->addTransformation(
-        std::make_shared<Translation>(
-            0.5f,
-            0.0f,
-            0.0f
-        )
-    );
-
-    transformation1->addTransformation(
-        std::make_shared<Rotation>(
-            glm::radians(45.0f),
-            glm::vec3(0.0f, 0.0f, 1.0f)
-        )
-    );
-
-    triangle1->setTransformation(
-        transformation1
-    );
-
-    scene1->addObject(
-        triangle1
-    );
-
-    auto triangle2 =
-        std::make_shared<DrawableObject>(
-            model1,
-            shader1
-        );
-
-    auto transformation2 =
-        std::make_shared<CompositeTransformation>();
-
-    transformation2->addTransformation(
-        std::make_shared<Rotation>(
-            glm::radians(45.0f),
-            glm::vec3(0.0f, 0.0f, 1.0f)
-        )
-    );
-
-    transformation2->addTransformation(
-        std::make_shared<Translation>(
-            0.5f,
-            0.0f,
-            0.0f
-        )
-    );
-
-    triangle2->setTransformation(
-        transformation2
-    );
-
-    scene1->addObject(
-        triangle2
-    );
-    auto scene1Login =
-        std::make_shared<DrawableObject>(
-            loginModel,
-            shader2
-        );
-
-    auto scene1LoginTransformation =
-        std::make_shared<CompositeTransformation>();
-
-    scene1LoginTransformation->addTransformation(
-        std::make_shared<Translation>(
-            0.72f,
-            -0.82f,
-            -0.1f
-        )
-    );
-
-    scene1LoginTransformation->addTransformation(
-        std::make_shared<Scale>(
-            0.20f,
-            0.20f,
-            0.20f
-        )
-    );
-
-    scene1Login->setTransformation(
-        scene1LoginTransformation
-    );
-
-    scene1->addObject(
-        scene1Login
-    );
-
-    auto sphereObject =
-        std::make_shared<DrawableObject>(
-            sphereModel,
-            shader1
-        );
-
-    auto sphereTransformation =
-        std::make_shared<CompositeTransformation>();
-
-    sphereTransformation->addTransformation(
-        std::make_shared<Scale>(
-            0.7f,
-            0.7f,
-            0.7f
-        )
-    );
-
-    sphereObject->setColorMode(3);
-    sphereObject->setTransformation(
-        sphereTransformation
-    );
-
-    scene2->addObject(
-        sphereObject
-    );
-    auto scene2Login =
-        std::make_shared<DrawableObject>(
-            loginModel,
-            shader2
-        );
-
-    auto scene2LoginTransformation =
-        std::make_shared<CompositeTransformation>();
-
-    scene2LoginTransformation->addTransformation(
-        std::make_shared<Translation>(
-            0.72f,
-            -0.82f,
-            -0.1f
-        )
-    );
-
-    scene2LoginTransformation->addTransformation(
-        std::make_shared<Scale>(
-            0.20f,
-            0.20f,
-            0.20f
-        )
-    );
-
-    scene2Login->setTransformation(
-        scene2LoginTransformation
-    );
-
-    scene2->addObject(
-        scene2Login
-    );
-
-    auto ground = std::make_shared<DrawableObject>(groundModel, shader1);
-
-    ground->setColor(glm::vec3(0.1f, 0.3f, 0.1f));
-    ground->setTransformation(
-        std::make_shared<Scale>(30.0f, 1.0f, 30.0f)
-    );
-
-    scene3->addObject(ground);
-
-    std::random_device random;
-    std::mt19937 generator(random());
-    std::uniform_real_distribution<float> treePosition(-20.0f, 20.0f);
-    std::uniform_real_distribution<float> treeScale(0.7f, 1.15f);
-    std::uniform_real_distribution<float> rotation(0.0f, glm::two_pi<float>());
-
-    for (int i = 0; i < 74; i++)
-    {
-        auto treeObject = std::make_shared<DrawableObject>(treeModel, shader1);
-        auto transformation = std::make_shared<CompositeTransformation>();
-        float x = treePosition(generator);
-        float z = treePosition(generator);
-        float scale = treeScale(generator);
-
-        transformation->addTransformation(std::make_shared<Translation>(x, 0.0f, z));
-        transformation->addTransformation(std::make_shared<Rotation>(rotation(generator), glm::vec3(0.0f, 1.0f, 0.0f)));
-        transformation->addTransformation(std::make_shared<Scale>(scale, scale, scale));
-        treeObject->setTransformation(transformation);
-        treeObject->setColorMode(2);
-        scene3->addObject(treeObject);
-    }
-
-    std::uniform_real_distribution<float> bushPosition(-23.0f, 23.0f);
-    std::uniform_real_distribution<float> bushScale(1.5f, 3.0f);
-
-    for (int i = 0; i < 15; i++)
-    {
-        auto bushObject = std::make_shared<DrawableObject>(bushModel, shader1);
-        auto transformation = std::make_shared<CompositeTransformation>();
-        float scale = bushScale(generator);
-
-        transformation->addTransformation(std::make_shared<Translation>(bushPosition(generator), 0.0f, bushPosition(generator)));
-        transformation->addTransformation(std::make_shared<Rotation>(rotation(generator), glm::vec3(0.0f, 1.0f, 0.0f)));
-        transformation->addTransformation(std::make_shared<Scale>(scale, scale, scale));
-        bushObject->setTransformation(transformation);
-        bushObject->setColor(glm::vec3(0.16f, 0.48f, 0.08f));
-        scene3->addObject(bushObject);
-    }
-
-    glm::vec3 clockPositions[] = {
-        glm::vec3(-3.0f, 1.7f, 16.0f),
-        glm::vec3(3.0f, 1.7f, 9.0f)
-    };
-
-    for (const glm::vec3& position : clockPositions) { 
-        auto clockObject = std::make_shared<DrawableObject>(clock, clockShader);
-        auto transformation = std::make_shared<CompositeTransformation>();
-        
-        transformation->addTransformation(
-            std::make_shared<Translation>(
-                position.x, position.y, position.z
-            )
-        );
-
-        transformation->addTransformation(
-            std::make_shared<Rotation>(
-                glm::radians(180.0f),
-                glm::vec3(0.0f, 1.0f, 0.0f)
-            )
-        );
-
-        transformation->addTransformation(
-            std::make_shared<Scale>(-1.0f, 1.0f, 1.0f)
-        );
-
-        clockObject->setTransformation(transformation);
-        scene3->addObject(clockObject);
-    }
-
-    auto loginObject =
-        std::make_shared<DrawableObject>(
-            loginModel,
-            shader2
-        );
-
-    auto loginTransformation =
-        std::make_shared<CompositeTransformation>();
-
-
-    loginTranslation =
-        std::make_shared<Translation>(
-            0.0f,
-            0.0f,
-            0.0f
-        );
-
-    loginRotationX =
-        std::make_shared<Rotation>(
-            0.0f,
-            glm::vec3(1.0f, 0.0f, 0.0f)
-        );
-
-    loginRotationY =
-        std::make_shared<Rotation>(
-            0.0f,
-            glm::vec3(0.0f, 1.0f, 0.0f)
-        );
-
-    loginRotationZ =
-        std::make_shared<Rotation>(
-            0.0f,
-            glm::vec3(0.0f, 0.0f, 1.0f)
-        );
-
-    loginScale =
-        std::make_shared<Scale>(
-            0.8f,
-            0.8f,
-            0.8f
-        );
-
-
-    loginTransformation->addTransformation(
-        loginTranslation
-    );
-
-    loginTransformation->addTransformation(
-        loginRotationX
-    );
-
-    loginTransformation->addTransformation(
-        loginRotationY
-    );
-
-    loginTransformation->addTransformation(
-        loginRotationZ
-    );
-
-    loginTransformation->addTransformation(
-        loginScale
-    );
-
-
-    loginObject->setTransformation(
-        loginTransformation
-    );
-
-    scene4->addObject(
-        loginObject
-    );
-
-    auto sunObject =
-        std::make_shared<DrawableObject>(
-            sunModel,
-            shader1
-        );
-
-    auto solarSunTransformation =
-        std::make_shared<CompositeTransformation>();
-
-    sunRotation =
-        std::make_shared<Rotation>(
-            0.0f,
-            glm::vec3(0.0f, 1.0f, 0.0f)
-        );
-
-    solarSunTransformation->addTransformation(
-        sunRotation
-    );
-
-    solarSunTransformation->addTransformation(
-        std::make_shared<Scale>(
-            0.18f,
-            0.18f,
-            0.18f
-        )
-    );
-
-    sunObject->setTransformation(
-        solarSunTransformation
-    );
-
-    scene5->addObject(
-        sunObject
-    );
-
-    auto earthOrbit =
-        std::make_shared<CompositeTransformation>();
-
-    earthOrbitRotation =
-        std::make_shared<Rotation>(
-            0.0f,
-            glm::vec3(0.0f, 0.0f, 1.0f)
-        );
-
-    earthOrbit->addTransformation(
-        earthOrbitRotation
-    );
-
-    earthOrbit->addTransformation(
-        std::make_shared<Translation>(
-            0.55f,
-            0.0f,
-            0.0f
-        )
-    );
-
-    auto earthObject =
-        std::make_shared<DrawableObject>(
-            earthModel,
-            shader1
-        );
-
-    auto earthTransformation =
-        std::make_shared<CompositeTransformation>();
-
-    earthSelfRotation =
-        std::make_shared<Rotation>(
-            0.0f,
-            glm::vec3(0.0f, 1.0f, 0.0f)
-        );
-
-    earthTransformation->addTransformation(
-        earthOrbit
-    );
-
-    earthTransformation->addTransformation(
-        earthSelfRotation
-    );
-
-    earthTransformation->addTransformation(
-        std::make_shared<Scale>(
-            0.08f,
-            0.08f,
-            0.08f
-        )
-    );
-
-    earthObject->setTransformation(
-        earthTransformation
-    );
-
-    scene5->addObject(
-        earthObject
-    );
-
-    auto moonObject =
-        std::make_shared<DrawableObject>(
-            moonModel,
-            shader1
-        );
-
-    auto moonTransformation =
-        std::make_shared<CompositeTransformation>();
-
-    moonOrbitRotation =
-        std::make_shared<Rotation>(
-            0.0f,
-            glm::vec3(0.0f, 0.0f, 1.0f)
-        );
-
-    auto moonOrbit =
-        std::make_shared<CompositeTransformation>();
-
-    moonOrbit->addTransformation(
-        moonOrbitRotation
-    );
-
-    moonOrbit->addTransformation(
-        std::make_shared<Translation>(
-            0.16f,
-            0.0f,
-            0.0f
-        )
-    );
-
-    moonSelfRotation =
-        std::make_shared<Rotation>(
-            0.0f,
-            glm::vec3(0.0f, 1.0f, 0.0f)
-        );
-
-    moonTransformation->addTransformation(
-        earthOrbit
-    );
-
-    moonTransformation->addTransformation(
-        moonOrbit
-    );
-
-    moonTransformation->addTransformation(
-        moonSelfRotation
-    );
-
-    moonTransformation->addTransformation(
-        std::make_shared<Scale>(
-            0.035f,
-            0.035f,
-            0.035f
-        )
-    );
-
-    moonObject->setTransformation(
-        moonTransformation
-    );
-
-    scene5->addObject(
-        moonObject
-    );
-
-
-    auto clockObject = std::make_shared<DrawableObject>(clock, clockShader);
-    clockObject->setTransformation(std::make_shared<Scale>(-1.0f, 1.0f, 1.0f));
-    scene6->addObject(clockObject);
-
-    glm::vec3 shperePositions[] = {
-        glm::vec3(-1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f)
-    };
-
-    for (const glm::vec3& position : shperePositions) {
-        auto sphereObject = std::make_shared<DrawableObject>(sphereModel, lightShader);
-        auto transformation = std::make_shared<CompositeTransformation>();
-
-        transformation->addTransformation(
-            std::make_shared<Translation>(
-                position.x, position.y, position.z
-            )
-        );
-
-        transformation->addTransformation(
-            std::make_shared<Scale>(
-                0.5,
-                0.5,
-                0.5
-            )
-        );
-
-        sphereObject->setTransformation(transformation);
-        scene7->addObject(sphereObject);
-    }
-
-    setScene(3);
-}
-
 void Application::framebufferCallback(GLFWwindow* window, int width, int height)
 {
     auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
@@ -657,6 +159,7 @@ void Application::setScene(int number)
     Scene* scenes[] = { scene1, scene2, scene3, scene4, scene5, scene6, scene7 };
     activeScene = scenes[number - 1];
     activeSceneNumber = number;
+    camera.setFieldOfView(60.0f);
     resetCamera();
 
 }
@@ -667,10 +170,20 @@ void Application::resetCamera()
         camera.setPose(glm::vec3(0.0f, 1.7f, 23.0f), glm::half_pi<float>(), -glm::half_pi<float>());
     else if (activeSceneNumber == 6)
         camera.setPose(glm::vec3(0.0f, 0.0f, -3.0f), glm::half_pi<float>(), glm::half_pi<float>());
+    else if (activeSceneNumber == 5)
+        camera.setPose(glm::vec3(0.0f, 0.0f, 6.5f), glm::half_pi<float>(), -glm::half_pi<float>());
+    else if (activeSceneNumber == 7)
+        camera.setPose(glm::vec3(0.0f, 0.0f, 6.0f), glm::half_pi<float>(), -glm::half_pi<float>());
     else
         camera.setPose(glm::vec3(0.0f, 0.0f, 2.0f), glm::half_pi<float>(), -glm::half_pi<float>());
 
     firstMouse = true;
+}
+
+void Application::scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+    auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+    app->camera.setFieldOfView(app->camera.getFieldOfView() - static_cast<float>(yOffset) * 5.0f);
 }
 
 void Application::processInput(float deltaTime)
@@ -746,6 +259,29 @@ void Application::updateClock()
         -glm::radians(hours * 30.0f));
 }
 
+void Application::drawLogin()
+{
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    if (width <= 0 || height <= 0)
+        return;
+
+    float scale = glm::min(100.0f, width * 0.4f);
+    glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f),
+        glm::vec3(width - scale - 10.0f, scale * 0.17f + 10.0f, 0.0f));
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(scale, scale, 1.0f));
+
+    shader2->setUniform("modelMatrix", modelMatrix);
+    shader2->setUniform("viewMatrix", glm::mat4(1.0f));
+    shader2->setUniform("projectionMatrix", glm::ortho(0.0f, static_cast<float>(width),
+        0.0f, static_cast<float>(height)));
+
+    glDisable(GL_DEPTH_TEST);
+    loginModel->draw();
+    glEnable(GL_DEPTH_TEST);
+    shader2->updateCamera(camera);
+}
+
 void Application::run()
 {
     glEnable(GL_DEPTH_TEST);
@@ -771,12 +307,15 @@ void Application::run()
         earthSelfRotation->setAngle(time * 2.0f);
         moonOrbitRotation->setAngle(time * 2.0f);
         moonSelfRotation->setAngle(time * 1.5f);
+        airplaneOrbitRotation->setAngle(time * 0.25f);
+        airplaneSelfRotation->setAngle(time);
 
         if (activeSceneNumber == 3 || activeSceneNumber == 6)
             updateClock();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         activeScene->draw();
+        drawLogin();
         glfwSwapBuffers(window);
     }
 }

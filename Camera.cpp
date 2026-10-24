@@ -15,7 +15,7 @@
 Camera::Camera()
     : eye(0.0f, 0.0f, 2.5f), up(0.0f, 1.0f, 0.0f),
       alpha(glm::half_pi<float>()), fi(-glm::half_pi<float>()),
-      aspectRatio(4.0f / 3.0f)
+      aspectRatio(4.0f / 3.0f), fieldOfView(60.0f)
 {
     updateView();
     updateProjection();
@@ -29,6 +29,22 @@ const glm::mat4& Camera::getViewMatrix() const
 const glm::mat4& Camera::getProjectionMatrix() const
 {
     return projectionMatrix;
+}
+
+const glm::vec3& Camera::getPosition() const
+{
+    return eye;
+}
+
+float Camera::getFieldOfView() const
+{
+    return fieldOfView;
+}
+
+void Camera::setFieldOfView(float degrees)
+{
+    fieldOfView = glm::clamp(degrees, 5.0f, 175.0f);
+    updateProjection();
 }
 
 void Camera::setPose(const glm::vec3& eye, float alpha, float fi)
@@ -74,7 +90,7 @@ void Camera::updateView()
 
 void Camera::updateProjection()
 {
-    projectionMatrix = glm::perspective(glm::radians(60.0f), aspectRatio, 0.1f, 100.0f);
+    projectionMatrix = glm::perspective(glm::radians(fieldOfView), aspectRatio, 0.1f, 100.0f);
     notify();
 }
 

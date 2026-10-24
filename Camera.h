@@ -21,6 +21,7 @@ private:
 	float alpha;
 	float fi;
 	float aspectRatio;
+	float fieldOfView;
 	std::vector<CameraObserver*> observers;
 
 	void updateView();
@@ -31,6 +32,9 @@ public:
 	Camera();
 	const glm::mat4& getViewMatrix() const;
 	const glm::mat4& getProjectionMatrix() const;
+	const glm::vec3& getPosition() const;
+	float getFieldOfView() const;
+	void setFieldOfView(float degrees);
 	void setPose(const glm::vec3& eye, float alpha, float fi);
 	void move(float forward, float right);
 	void rotate(float deltaX, float deltaY);

@@ -1,0 +1,7 @@
+B737 by amvlab, copyright 2026.
+Source: https://github.com/amvlab/aircraft-models
+Original file: models/B737_nologo.glb
+License: Creative Commons Attribution 4.0 International (CC BY 4.0).
+https://creativecommons.org/licenses/by/4.0/
+Changes: GLB node transform applied; mesh centered on its longitudinal fuselage axis and uniformly scaled;
+texture colors sampled into vertex colors; exported to boeing737.h.

@@ -79,6 +79,8 @@ void ShaderProgram::updateCamera(const Camera& camera)
 {
     setUniform("viewMatrix", camera.getViewMatrix());
     setUniform("projectionMatrix", camera.getProjectionMatrix());
+    const glm::vec3& position = camera.getPosition();
+    setUniform("cameraPosition", position.x, position.y, position.z);
 }
 
 void ShaderProgram::use()

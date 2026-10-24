@@ -28,7 +28,10 @@ private:
     ShaderProgram* shader1 = nullptr;
     ShaderProgram* shader2 = nullptr;
     ShaderProgram* clockShader = nullptr;
-    ShaderProgram* lightShader = nullptr;
+    ShaderProgram* ambientShader = nullptr;
+    ShaderProgram* lambertShader = nullptr;
+    ShaderProgram* phongShader = nullptr;
+    ShaderProgram* blinnShader = nullptr;
 
     Model* model1 = nullptr;
     Model* sphereModel = nullptr;
@@ -40,6 +43,7 @@ private:
     Model* moonModel = nullptr;
     Model* clock = nullptr;
     Model* groundModel = nullptr;
+    Model* airplaneModel = nullptr;
 
     Scene* scene1 = nullptr;
     Scene* scene2 = nullptr;
@@ -62,6 +66,8 @@ private:
     std::shared_ptr<Rotation> earthSelfRotation;
     std::shared_ptr<Rotation> moonOrbitRotation;
     std::shared_ptr<Rotation> moonSelfRotation;
+    std::shared_ptr<Rotation> airplaneOrbitRotation;
+    std::shared_ptr<Rotation> airplaneSelfRotation;
 
     float moveX = 0.0f;
     float moveY = 0.0f;
@@ -77,12 +83,21 @@ private:
     double lastMouseY = 0.0;
 
     void setScene(int number);
+    void createTransformationScene();
+    void createSphereScene();
+    void createForestScene();
+    void createLoginScene();
+    void createSolarScene();
+    void createClockScene();
+    void createLightingScene();
+    void drawLogin();
     void resetCamera();
     void processInput(float deltaTime);
     bool keyPressed(int key) const;
     void updateClock();
     static void framebufferCallback(GLFWwindow* window, int width, int height);
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 
 public:
     ~Application();
