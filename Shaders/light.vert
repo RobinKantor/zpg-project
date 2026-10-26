@@ -18,8 +18,9 @@ void main()
 {
     vec4 world = modelMatrix * vec4(position, 1.0);
     worldPosition = world.xyz / world.w;
-    mat3 normalMatrix = mat3(transpose(inverse(modelMatrix)));
+    mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
     worldNormal = normalize(normalMatrix * normal);
+    //worldNormal = normalize(mat3(modelMatrix) * normal);
     vertexColor = colorMode == 1 ? objectColor : color;
     gl_Position = projectionMatrix * viewMatrix * world;
 }
