@@ -20,7 +20,7 @@ void main()
     worldPosition = world.xyz / world.w;
     mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
     worldNormal = normalize(normalMatrix * normal);
-    //worldNormal = normalize(mat3(modelMatrix) * normal);
+    //worldNormal = normalize(normal);
     vertexColor = colorMode == 1 ? objectColor : color;
     gl_Position = projectionMatrix * viewMatrix * world;
 }
