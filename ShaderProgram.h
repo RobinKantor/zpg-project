@@ -6,6 +6,7 @@
 #pragma once
 
 #include "CameraObserver.h"
+#include "Light.h"
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
@@ -30,4 +31,5 @@ public:
 	void setUniform(const char* name, int value);
 	void setUniform(const char* name, float x, float y, float z);
 	void setUniform(const char* name, const glm::mat4& matrix);
+	void setLight(const Light& light);
 };

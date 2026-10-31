@@ -111,3 +111,16 @@ void ShaderProgram::setUniform(const char* name, const glm::mat4& matrix)
     use();
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
+
+void ShaderProgram::setLight(const Light& light)
+{
+    setUniform("lightPosition",
+        light.position.x, light.position.y, light.position.z);
+
+    setUniform("lightColor",
+        light.color.x, light.color.y, light.color.z);
+
+    setUniform("constant", light.constant);
+    setUniform("linear", light.linear);
+    setUniform("quadratic", light.quadratic);
+}

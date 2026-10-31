@@ -20,7 +20,22 @@ void main()
     worldPosition = world.xyz / world.w;
     mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
     worldNormal = normalize(normalMatrix * normal);
-    //worldNormal = normalize(normal);
-    vertexColor = colorMode == 1 ? objectColor : color;
+
+    if (colorMode == 1)
+    {
+        vertexColor = objectColor;
+    }
+    else if (colorMode == 2)
+    {
+        if (gl_VertexID >= 36444)
+            vertexColor = vec3(0.12, 0.55, 0.08);
+        else
+            vertexColor = vec3(0.35, 0.16, 0.06);
+    }
+    else
+    {
+        vertexColor = color;
+    }
+
     gl_Position = projectionMatrix * viewMatrix * world;
 }

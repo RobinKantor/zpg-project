@@ -36,6 +36,7 @@ Application::~Application()
     delete scene5;
     delete scene6;
     delete scene7;
+    delete scene8;
 
     delete model1;
     delete sphereModel;
@@ -142,7 +143,7 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
         return;
 
     auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_7)
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_8)
         app->setScene(key - GLFW_KEY_1 + 1);
     else if (key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -156,7 +157,10 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
 
 void Application::setScene(int number)
 {
-    Scene* scenes[] = { scene1, scene2, scene3, scene4, scene5, scene6, scene7 };
+    Scene* scenes[] = {
+        scene1, scene2, scene3, scene4,
+        scene5, scene6, scene7, scene8
+    };
     activeScene = scenes[number - 1];
     activeSceneNumber = number;
     camera.setFieldOfView(60.0f);
@@ -166,7 +170,7 @@ void Application::setScene(int number)
 
 void Application::resetCamera()
 {
-    if (activeSceneNumber == 3)
+    if (activeSceneNumber == 3 || activeSceneNumber == 8)
         camera.setPose(glm::vec3(0.0f, 1.7f, 23.0f), glm::half_pi<float>(), -glm::half_pi<float>());
     else if (activeSceneNumber == 6)
         camera.setPose(glm::vec3(0.0f, 0.0f, -3.0f), glm::half_pi<float>(), glm::half_pi<float>());

@@ -74,6 +74,8 @@
     <ClInclude Include="CameraObserver.h" />
     <ClInclude Include="CompositeTransformation.h" />
     <ClInclude Include="DrawableObject.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Rotation.h" />
     <ClInclude Include="Scale.h" />

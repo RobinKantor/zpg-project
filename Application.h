@@ -52,6 +52,7 @@ private:
     Scene* scene5 = nullptr;
     Scene* scene6 = nullptr;
     Scene* scene7 = nullptr;
+    Scene* scene8 = nullptr;
     Scene* activeScene = nullptr;
     int activeSceneNumber = 0;
 
@@ -86,6 +87,7 @@ private:
     void createTransformationScene();
     void createSphereScene();
     void createForestScene();
+    void createForest(Scene* scene, ShaderProgram* shader);
     void createLoginScene();
     void createSolarScene();
     void createClockScene();

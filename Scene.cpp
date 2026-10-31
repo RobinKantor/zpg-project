@@ -12,10 +12,15 @@ void Scene::addObject(
     objects.push_back(object);
 }
 
+void Scene::setLight(const Light& light)
+{
+    this->light = light;
+}
+
 void Scene::draw()
 {
     for (const auto& object : objects)
     {
-        object->draw();
+        object->draw(light);
     }
 }

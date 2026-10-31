@@ -17,10 +17,36 @@ void Application::createScenes()
     scene5 = new Scene();
     scene6 = new Scene();
     scene7 = new Scene();
+    scene8 = new Scene();
 
     createTransformationScene();
     createSphereScene();
     createForestScene();
+
+    createForest(scene8, phongShader);
+    Light fireflyLight;
+    fireflyLight.position = glm::vec3(0.0f, 2.0f, 18.0f);
+    fireflyLight.color = glm::vec3(5.0f, 4.9f, 4.7f);
+    fireflyLight.constant = 1.0f;
+    fireflyLight.linear = 0.7f;
+    fireflyLight.quadratic = 1.8f;
+    scene8->setLight(fireflyLight);
+
+    auto firefly = std::make_shared<DrawableObject>(sphereModel, ambientShader);
+    auto transformation = std::make_shared<CompositeTransformation>();
+
+    transformation->addTransformation(std::make_shared<Translation>(
+        fireflyLight.position.x,
+        fireflyLight.position.y,
+        fireflyLight.position.z));
+
+    transformation->addTransformation(
+        std::make_shared<Scale>(0.08f, 0.08f, 0.08f));
+
+    firefly->setTransformation(transformation);
+    firefly->setColor(glm::vec3(1.0f, 0.98f, 0.94f));
+    scene8->addObject(firefly);
+
     createLoginScene();
     createSolarScene();
     createClockScene();
@@ -53,12 +79,12 @@ void Application::createSphereScene()
     scene2->addObject(sphere);
 }
 
-void Application::createForestScene()
+void Application::createForest(Scene* scene, ShaderProgram* shader)
 {
-    auto ground = std::make_shared<DrawableObject>(groundModel, shader1);
+    auto ground = std::make_shared<DrawableObject>(groundModel, shader);
     ground->setColor(glm::vec3(0.1f, 0.3f, 0.1f));
     ground->setTransformation(std::make_shared<Scale>(30.0f, 1.0f, 30.0f));
-    scene3->addObject(ground);
+    scene->addObject(ground);
 
     std::random_device random;
     std::mt19937 generator(random());
@@ -68,7 +94,7 @@ void Application::createForestScene()
 
     for (int i = 0; i < 74; i++)
     {
-        auto tree = std::make_shared<DrawableObject>(treeModel, shader1);
+        auto tree = std::make_shared<DrawableObject>(treeModel, shader);
         auto transformation = std::make_shared<CompositeTransformation>();
         float x = treePosition(generator);
         float z = treePosition(generator);
@@ -78,7 +104,7 @@ void Application::createForestScene()
         transformation->addTransformation(std::make_shared<Scale>(scale, scale, scale));
         tree->setTransformation(transformation);
         tree->setColorMode(2);
-        scene3->addObject(tree);
+        scene->addObject(tree);
     }
 
     std::uniform_real_distribution<float> bushPosition(-23.0f, 23.0f);
@@ -86,7 +112,7 @@ void Application::createForestScene()
 
     for (int i = 0; i < 15; i++)
     {
-        auto bush = std::make_shared<DrawableObject>(bushModel, shader1);
+        auto bush = std::make_shared<DrawableObject>(bushModel, shader);
         auto transformation = std::make_shared<CompositeTransformation>();
         float scale = bushScale(generator);
         transformation->addTransformation(std::make_shared<Translation>(bushPosition(generator), 0.0f, bushPosition(generator)));
@@ -94,8 +120,13 @@ void Application::createForestScene()
         transformation->addTransformation(std::make_shared<Scale>(scale, scale, scale));
         bush->setTransformation(transformation);
         bush->setColor(glm::vec3(0.16f, 0.48f, 0.08f));
-        scene3->addObject(bush);
+        scene->addObject(bush);
     }
+}
+
+void Application::createForestScene()
+{
+    createForest(scene3, shader1);
 
     glm::vec3 positions[] = {
         glm::vec3(-3.0f, 1.7f, 16.0f),

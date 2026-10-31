@@ -21,8 +21,10 @@ void DrawableObject::setTransformation(
     this->transformation = transformation;
 }
 
-void DrawableObject::draw()
+void DrawableObject::draw(const Light& light)
 {
+    shaderProgram->setLight(light);
+
     glm::mat4 modelMatrix = glm::mat4(1.0f);
 
     if (transformation)
@@ -39,6 +41,18 @@ void DrawableObject::draw()
     shaderProgram->setUniform("objectColor", color.x, color.y, color.z);
 
     shaderProgram->use();
+
+    shaderProgram->setUniform("material.ambient",
+        material.ambient.x, material.ambient.y, material.ambient.z);
+
+    shaderProgram->setUniform("material.diffuse",
+        material.diffuse.x, material.diffuse.y, material.diffuse.z);
+
+    shaderProgram->setUniform("material.specular",
+        material.specular.x, material.specular.y, material.specular.z);
+
+    shaderProgram->setUniform("material.shininess", material.shininess);
+
     model->draw();
 }
 
@@ -51,4 +65,9 @@ void DrawableObject::setColor(const glm::vec3& color)
 void DrawableObject::setColorMode(int mode)
 {
     colorMode = mode;
+}
+
+void DrawableObject::setMaterial(const Material& material)
+{
+    this->material = material;
 }

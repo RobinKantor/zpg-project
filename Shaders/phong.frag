@@ -8,11 +8,21 @@ uniform vec3 lightPosition = vec3(0.0);
 uniform vec3 lightColor = vec3(1.0);
 uniform vec3 cameraPosition;
 
-const float constant = 1.0;
-const float linear = 0.09;
-const float quadratic = 0.032;
-
 out vec4 FragColor;
+
+uniform float constant = 1.0;
+uniform float linear = 0.09;
+uniform float quadratic = 0.032;
+
+struct Material
+{
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+};
+
+uniform Material material;
 
 void main()
 {
@@ -29,12 +39,12 @@ void main()
     if (diff > 0.0)
     {
         vec3 reflectDir = reflect(-lightDir, normal);
-        spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     }
 
-    vec3 ambient = 0.1 * vertexColor;
-    vec3 diffuse = diff * vertexColor * lightColor * att;
-    vec3 specular = 0.5 * spec * lightColor * att;
+    vec3 ambient = material.ambient * vertexColor;
+    vec3 diffuse = material.diffuse * diff * vertexColor * lightColor * att;
+    vec3 specular = material.specular * spec * lightColor * att;
 
     FragColor = vec4(ambient + diffuse + specular, 1.0);
 }
