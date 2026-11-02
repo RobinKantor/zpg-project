@@ -41,7 +41,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Users\kan0310\Downloads\glad\include;C:\Users\kan0310\Downloads\glad;$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\KAN0310\zpg_projekt\zpg-project\Dependencies\stbimage;C:\Users\kan0310\Downloads\glad\include;C:\Users\kan0310\Downloads\glad;$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -110,6 +110,8 @@
     <None Include="Models\Source\B737_nologo.glb" />
     <None Include="Models\Source\AMVLab_License.txt" />
     <None Include="Models\Source\B737_attribution.txt" />
+    <None Include="texture.frag" />
+    <None Include="texture.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="CheckShaderLocation" BeforeTargets="PrepareForBuild">

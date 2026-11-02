@@ -32,6 +32,7 @@ private:
     ShaderProgram* lambertShader = nullptr;
     ShaderProgram* phongShader = nullptr;
     ShaderProgram* blinnShader = nullptr;
+    ShaderProgram* textureShader = nullptr;
 
     Model* model1 = nullptr;
     Model* sphereModel = nullptr;
@@ -43,6 +44,7 @@ private:
     Model* moonModel = nullptr;
     Model* clock = nullptr;
     Model* groundModel = nullptr;
+    Model* groundTModel = nullptr;
     Model* airplaneModel = nullptr;
 
     Scene* scene1 = nullptr;
@@ -53,6 +55,7 @@ private:
     Scene* scene6 = nullptr;
     Scene* scene7 = nullptr;
     Scene* scene8 = nullptr;
+    Scene* scene9 = nullptr;
     Scene* activeScene = nullptr;
     int activeSceneNumber = 0;
 
@@ -92,6 +95,7 @@ private:
     void createSolarScene();
     void createClockScene();
     void createLightingScene();
+    void createTextureScene();
     void drawLogin();
     void resetCamera();
     void processInput(float deltaTime);

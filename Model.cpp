@@ -8,11 +8,19 @@
 Model::Model(const float* points, int size, int vertexCount, VertexFormat format)
     : vertexCount(vertexCount)
 {
+
     bool hasColor = format != VertexFormat::PositionNormal;
     bool hasNormal = format != VertexFormat::PositionColor;
-    int valuesPerVertex = hasColor && hasNormal ? 9 : 6;
     int colorOffset = format == VertexFormat::PositionNormalColor ? 6 : 3;
     int normalOffset = format == VertexFormat::PositionColorNormal ? 6 : 3;
+
+    int valuesPerVertex = 6;
+    if (format == VertexFormat::PositionColorNormal || format == VertexFormat::PositionNormalColor) {
+        valuesPerVertex = 9;
+    }
+    else if (format == VertexFormat::PositionNormalTexture) {
+        valuesPerVertex = 8;
+    }
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -23,23 +31,34 @@ Model::Model(const float* points, int size, int vertexCount, VertexFormat format
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    if (hasColor)
+    if (format == VertexFormat::PositionNormalTexture)
     {
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float),
-            reinterpret_cast<void*>(colorOffset * sizeof(float)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
-    }
-    else
-        glVertexAttrib3f(1, 1.0f, 1.0f, 1.0f);
 
-    if (hasNormal)
-    {
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float),
-            reinterpret_cast<void*>(normalOffset * sizeof(float)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
     }
     else
-        glVertexAttrib3f(2, 0.0f, 1.0f, 0.0f);
+    {
+        if (hasColor)
+        {
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float),
+                reinterpret_cast<void*>(colorOffset * sizeof(float)));
+            glEnableVertexAttribArray(1);
+        }
+        else
+            glVertexAttrib3f(1, 1.0f, 1.0f, 1.0f);
+
+        if (hasNormal)
+        {
+            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, valuesPerVertex * sizeof(float),
+                reinterpret_cast<void*>(normalOffset * sizeof(float)));
+            glEnableVertexAttribArray(2);
+        }
+        else
+            glVertexAttrib3f(2, 0.0f, 1.0f, 0.0f);
+    }
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

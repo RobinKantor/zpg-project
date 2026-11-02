@@ -12,7 +12,8 @@ enum class VertexFormat
 	PositionColor,
 	PositionNormal,
 	PositionColorNormal,
-	PositionNormalColor
+	PositionNormalColor,
+	PositionNormalTexture
 };
 
 class Model {

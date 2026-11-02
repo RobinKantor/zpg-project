@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @author Robin Kantor
  * @login KAN0310
  */
@@ -36,6 +36,7 @@ Application::~Application()
     delete scene5;
     delete scene6;
     delete scene7;
+    delete scene8;
     delete scene8;
 
     delete model1;
@@ -108,6 +109,7 @@ void Application::createShaders()
     lambertShader = new ShaderProgram("Shaders/light.vert", "Shaders/lambert.frag", &camera);
     phongShader = new ShaderProgram("Shaders/light.vert", "Shaders/phong.frag", &camera);
     blinnShader = new ShaderProgram("Shaders/light.vert", "Shaders/blinn.frag", &camera);
+    textureShader = new ShaderProgram("Shaders/texture.vert", "Shaders/texture.frag", &camera);
 }
 
 void Application::createModels()
@@ -116,6 +118,17 @@ void Application::createModels()
         -0.7f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
         -0.3f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
         -0.9f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f
+    };
+
+    const float plain1[] = {
+        //vrchol, normála, uv souřadnice
+        1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+        1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+       -1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,
+
+       -1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+       -1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f
     };
 
     model1 = new Model(points1, sizeof(points1), 3, VertexFormat::PositionColor);
@@ -128,8 +141,10 @@ void Application::createModels()
     moonModel = new Model(moon, sizeof(moon), sizeof(moon) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
     clock = new Model(clockModel, sizeof(clockModel), static_cast<int>(vertexCount), VertexFormat::PositionNormalColor);
     groundModel = new Model(plain, sizeof(plain), 6);
+    groundTModel = new Model(plain1, sizeof(plain1), 6, VertexFormat::PositionNormalTexture);
     airplaneModel = new Model(boeing737, sizeof(boeing737), sizeof(boeing737) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
 }
+
 void Application::framebufferCallback(GLFWwindow* window, int width, int height)
 {
     auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
@@ -143,7 +158,7 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
         return;
 
     auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_8)
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9)
         app->setScene(key - GLFW_KEY_1 + 1);
     else if (key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -159,7 +174,7 @@ void Application::setScene(int number)
 {
     Scene* scenes[] = {
         scene1, scene2, scene3, scene4,
-        scene5, scene6, scene7, scene8
+        scene5, scene6, scene7, scene8, scene9
     };
     activeScene = scenes[number - 1];
     activeSceneNumber = number;

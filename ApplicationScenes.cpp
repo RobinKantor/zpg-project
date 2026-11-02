@@ -3,10 +3,14 @@
  * @login KAN0310
  */
 
+#define STB_IMAGE_IMPLEMENTATION
+
 #include "Application.h"
 
 #include <glm/gtc/constants.hpp>
 #include <random>
+#include <stb_image.h>
+#include <cstdio>
 
 void Application::createScenes()
 {
@@ -18,6 +22,7 @@ void Application::createScenes()
     scene6 = new Scene();
     scene7 = new Scene();
     scene8 = new Scene();
+    scene9 = new Scene();
 
     createTransformationScene();
     createSphereScene();
@@ -51,6 +56,7 @@ void Application::createScenes()
     createSolarScene();
     createClockScene();
     createLightingScene();
+    createTextureScene();
     setScene(3);
 }
 
@@ -245,4 +251,41 @@ void Application::createLightingScene()
         sphere->setColor(glm::vec3(0.385f, 0.647f, 0.812f));
         scene7->addObject(sphere);
     }
+}
+
+void Application::createTextureScene()
+{
+    int text_width, text_height, channels;
+    stbi_set_flip_vertically_on_load(true);
+
+    unsigned char* data = stbi_load("wooden_fence.jpg", &text_width, &text_height, &channels, 4);
+    if (!data) {
+        std::printf("Error loading texture: wooden_fence.png\n");
+    }
+
+    glActiveTexture(GL_TEXTURE0);
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, text_width, text_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_image_free(data);
+
+    textureShader->use();
+    textureShader->setUniform("samplerTexture", 0);
+
+    auto ground = std::make_shared<DrawableObject>(groundTModel, textureShader);
+
+    auto transformation = std::make_shared<CompositeTransformation>();
+    transformation->addTransformation(std::make_shared<Scale>(3.0f, 1.0f, 3.0f));
+    ground->setTransformation(transformation);
+
+    scene9->addObject(ground);
 }
