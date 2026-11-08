@@ -18,6 +18,13 @@
 #include "Models/moon.h"
 #include "Models/clock.h"
 #include "Models/plain.h"
+#include "Models/classroom.h"
+#include "Models/door.h"
+#include "Models/whiteboard.h"
+#include "Models/table.h"
+#include "Models/chair.h"
+#include "Models/shrek.h"
+#include "Models/monitor.h"
 #include "Models/boeing737.h"
 
 #include <glm/gtc/constants.hpp>
@@ -36,8 +43,6 @@ Application::~Application()
     delete scene5;
     delete scene6;
     delete scene7;
-    delete scene8;
-    delete scene8;
 
     delete model1;
     delete sphereModel;
@@ -50,6 +55,13 @@ Application::~Application()
     delete clock;
     delete groundModel;
     delete airplaneModel;
+    delete classroomModel;
+    delete doorModel;
+    delete whiteboardModel;
+    delete tableModel;
+    delete chairModel;
+    delete shrekModel;
+    delete monitorModel;
 
     delete shader1;
     delete shader2;
@@ -58,6 +70,8 @@ Application::~Application()
     delete lambertShader;
     delete phongShader;
     delete blinnShader;
+    delete textureShader;
+    delete skyboxShader;
 
     if (window)
         glfwDestroyWindow(window);
@@ -110,6 +124,7 @@ void Application::createShaders()
     phongShader = new ShaderProgram("Shaders/light.vert", "Shaders/phong.frag", &camera);
     blinnShader = new ShaderProgram("Shaders/light.vert", "Shaders/blinn.frag", &camera);
     textureShader = new ShaderProgram("Shaders/texture.vert", "Shaders/texture.frag", &camera);
+    skyboxShader = new ShaderProgram("Shaders/skybox.vert", "Shaders/skybox.frag", &camera);
 }
 
 void Application::createModels()
@@ -118,17 +133,6 @@ void Application::createModels()
         -0.7f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
         -0.3f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
         -0.9f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f
-    };
-
-    const float plain1[] = {
-        //vrchol, normála, uv souřadnice
-        1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-        1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-       -1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f,
-
-       -1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-       -1.0f, 0.0f,-1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f
     };
 
     model1 = new Model(points1, sizeof(points1), 3, VertexFormat::PositionColor);
@@ -141,7 +145,13 @@ void Application::createModels()
     moonModel = new Model(moon, sizeof(moon), sizeof(moon) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
     clock = new Model(clockModel, sizeof(clockModel), static_cast<int>(vertexCount), VertexFormat::PositionNormalColor);
     groundModel = new Model(plain, sizeof(plain), 6);
-    groundTModel = new Model(plain1, sizeof(plain1), 6, VertexFormat::PositionNormalTexture);
+    classroomModel = new Model(classroomVertices, sizeof(classroomVertices), sizeof(classroomVertices) / (8 * sizeof(float)), VertexFormat::PositionNormalTexture);
+    doorModel = new Model(doorVertices, sizeof(doorVertices), sizeof(doorVertices) / (8 * sizeof(float)), VertexFormat::PositionNormalTexture);
+    whiteboardModel = new Model(whiteboardVertices, sizeof(whiteboardVertices), sizeof(whiteboardVertices) / (8 * sizeof(float)), VertexFormat::PositionNormalTexture);
+    tableModel = new Model(tableVertices, sizeof(tableVertices), sizeof(tableVertices) / (8 * sizeof(float)), VertexFormat::PositionNormalTexture);
+    chairModel = new Model(chairVertices, sizeof(chairVertices), sizeof(chairVertices) / (8 * sizeof(float)), VertexFormat::PositionNormalTexture);
+    monitorModel = new Model(monitorVertices, sizeof(monitorVertices), sizeof(monitorVertices) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
+    shrekModel = new Model(shrekVertices, sizeof(shrekVertices), sizeof(shrekVertices) / (8 * sizeof(float)), VertexFormat::PositionNormalTexture);
     airplaneModel = new Model(boeing737, sizeof(boeing737), sizeof(boeing737) / (9 * sizeof(float)), VertexFormat::PositionColorNormal);
 }
 
@@ -158,11 +168,11 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
         return;
 
     auto app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9)
+    if (key >= GLFW_KEY_1 && key <= GLFW_KEY_7)
         app->setScene(key - GLFW_KEY_1 + 1);
     else if (key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-    else if (key == GLFW_KEY_R && app->activeSceneNumber == 4)
+    else if (key == GLFW_KEY_R && app->activeSceneNumber == 3)
     {
         app->moveX = app->moveY = app->moveZ = 0.0f;
         app->rotationX = app->rotationY = app->rotationZ = 0.0f;
@@ -173,8 +183,7 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
 void Application::setScene(int number)
 {
     Scene* scenes[] = {
-        scene1, scene2, scene3, scene4,
-        scene5, scene6, scene7, scene8, scene9
+        scene1, scene2, scene3, scene4, scene5, scene6, scene7
     };
     activeScene = scenes[number - 1];
     activeSceneNumber = number;
@@ -185,14 +194,14 @@ void Application::setScene(int number)
 
 void Application::resetCamera()
 {
-    if (activeSceneNumber == 3 || activeSceneNumber == 8)
+    if (activeSceneNumber == 2 || activeSceneNumber == 6)
         camera.setPose(glm::vec3(0.0f, 1.7f, 23.0f), glm::half_pi<float>(), -glm::half_pi<float>());
-    else if (activeSceneNumber == 6)
-        camera.setPose(glm::vec3(0.0f, 0.0f, -3.0f), glm::half_pi<float>(), glm::half_pi<float>());
-    else if (activeSceneNumber == 5)
+    else if (activeSceneNumber == 4)
         camera.setPose(glm::vec3(0.0f, 0.0f, 6.5f), glm::half_pi<float>(), -glm::half_pi<float>());
-    else if (activeSceneNumber == 7)
+    else if (activeSceneNumber == 5)
         camera.setPose(glm::vec3(0.0f, 0.0f, 6.0f), glm::half_pi<float>(), -glm::half_pi<float>());
+    else if (activeSceneNumber == 7)
+        camera.setPose(glm::vec3(2.8f, 1.6f, 4.0f), glm::half_pi<float>(), glm::pi<float>());
     else
         camera.setPose(glm::vec3(0.0f, 0.0f, 2.0f), glm::half_pi<float>(), -glm::half_pi<float>());
 
@@ -231,7 +240,7 @@ void Application::processInput(float deltaTime)
     if (!glfwGetWindowAttrib(window, GLFW_FOCUSED))
         return;
 
-    if (activeSceneNumber == 4)
+    if (activeSceneNumber == 3)
     {
         moveX += (keyPressed(GLFW_KEY_RIGHT) - keyPressed(GLFW_KEY_LEFT)) * deltaTime;
         moveY += (keyPressed(GLFW_KEY_UP) - keyPressed(GLFW_KEY_DOWN)) * deltaTime;
@@ -251,7 +260,7 @@ void Application::processInput(float deltaTime)
         if (glm::length(movement) > 0.0f)
         {
             movement = glm::normalize(movement);
-            float speed = activeSceneNumber == 3 ? 4.0f : 1.5f;
+            float speed = activeSceneNumber == 2 ? 4.0f : 1.5f;
             camera.move(movement.y * speed * deltaTime, movement.x * speed * deltaTime);
         }
     }
@@ -329,7 +338,7 @@ void Application::run()
         airplaneOrbitRotation->setAngle(time * 0.25f);
         airplaneSelfRotation->setAngle(time);
 
-        if (activeSceneNumber == 3 || activeSceneNumber == 6)
+        if (activeSceneNumber == 2)
             updateClock();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

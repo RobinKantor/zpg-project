@@ -8,6 +8,10 @@
       <Extensions>h;hpp;hxx</Extensions>
     </Filter>
     <Filter Include="Modely" />
+    <Filter Include="Textury"><Extensions>png;jpg;jpeg;bmp;tga</Extensions></Filter>
+    <Filter Include="Textury\Characters" />
+    <Filter Include="Textury\EB408" />
+    <Filter Include="Textury\Skybox" />
     <Filter Include="Shadery">
       <Extensions>vert;frag;geom;glsl</Extensions>
     </Filter>
@@ -170,11 +174,39 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="texture.frag">
+    <None Include="Shaders\texture.frag">
       <Filter>Shadery</Filter>
     </None>
-    <None Include="texture.vert">
+    <None Include="Shaders\texture.vert">
       <Filter>Shadery</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Texture.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
+    <ClCompile Include="Skybox.cpp"><Filter>Zdrojové soubory</Filter></ClCompile>
+    <ClInclude Include="Texture.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
+    <ClInclude Include="Skybox.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
+    <ClInclude Include="Dependencies\stbimage\stb_image.h"><Filter>Hlavičkové soubory</Filter></ClInclude>
+    <ClInclude Include="Models\classroom.h"><Filter>Modely</Filter></ClInclude>
+    <ClInclude Include="Models\door.h"><Filter>Modely</Filter></ClInclude>
+    <ClInclude Include="Models\whiteboard.h"><Filter>Modely</Filter></ClInclude>
+    <ClInclude Include="Models\table.h"><Filter>Modely</Filter></ClInclude>
+    <ClInclude Include="Models\chair.h"><Filter>Modely</Filter></ClInclude>
+    <ClInclude Include="Models\shrek.h"><Filter>Modely</Filter></ClInclude>
+    <ClInclude Include="Models\monitor.h"><Filter>Modely</Filter></ClInclude>
+    <None Include="Textures\Characters\shrek.png"><Filter>Textury\Characters</Filter></None>
+    <None Include="Textures\EB408\chair.png"><Filter>Textury\EB408</Filter></None>
+    <None Include="Textures\EB408\classroom.png"><Filter>Textury\EB408</Filter></None>
+    <None Include="Textures\EB408\door.png"><Filter>Textury\EB408</Filter></None>
+    <None Include="Textures\EB408\table.png"><Filter>Textury\EB408</Filter></None>
+    <None Include="Textures\EB408\whiteboard.png"><Filter>Textury\EB408</Filter></None>
+    <None Include="Textures\Skybox\negx.jpg"><Filter>Textury\Skybox</Filter></None>
+    <None Include="Textures\Skybox\negy.jpg"><Filter>Textury\Skybox</Filter></None>
+    <None Include="Textures\Skybox\negz.jpg"><Filter>Textury\Skybox</Filter></None>
+    <None Include="Textures\Skybox\posx.jpg"><Filter>Textury\Skybox</Filter></None>
+    <None Include="Textures\Skybox\posy.jpg"><Filter>Textury\Skybox</Filter></None>
+    <None Include="Textures\Skybox\posz.jpg"><Filter>Textury\Skybox</Filter></None>
+    <None Include="Shaders\skybox.vert"><Filter>Shadery</Filter></None>
+    <None Include="Shaders\skybox.frag"><Filter>Shadery</Filter></None>
   </ItemGroup>
 </Project>

@@ -3,14 +3,10 @@
  * @login KAN0310
  */
 
-#define STB_IMAGE_IMPLEMENTATION
-
 #include "Application.h"
 
 #include <glm/gtc/constants.hpp>
 #include <random>
-#include <stb_image.h>
-#include <cstdio>
 
 void Application::createScenes()
 {
@@ -21,43 +17,17 @@ void Application::createScenes()
     scene5 = new Scene();
     scene6 = new Scene();
     scene7 = new Scene();
-    scene8 = new Scene();
-    scene9 = new Scene();
 
     createTransformationScene();
-    createSphereScene();
     createForestScene();
 
-    createForest(scene8, phongShader);
-    Light fireflyLight;
-    fireflyLight.position = glm::vec3(0.0f, 2.0f, 18.0f);
-    fireflyLight.color = glm::vec3(5.0f, 4.9f, 4.7f);
-    fireflyLight.constant = 1.0f;
-    fireflyLight.linear = 0.7f;
-    fireflyLight.quadratic = 1.8f;
-    scene8->setLight(fireflyLight);
-
-    auto firefly = std::make_shared<DrawableObject>(sphereModel, ambientShader);
-    auto transformation = std::make_shared<CompositeTransformation>();
-
-    transformation->addTransformation(std::make_shared<Translation>(
-        fireflyLight.position.x,
-        fireflyLight.position.y,
-        fireflyLight.position.z));
-
-    transformation->addTransformation(
-        std::make_shared<Scale>(0.08f, 0.08f, 0.08f));
-
-    firefly->setTransformation(transformation);
-    firefly->setColor(glm::vec3(1.0f, 0.98f, 0.94f));
-    scene8->addObject(firefly);
+    createNightForestScene();
 
     createLoginScene();
     createSolarScene();
-    createClockScene();
     createLightingScene();
-    createTextureScene();
-    setScene(3);
+    createClassroomScene();
+    setScene(2);
 }
 
 void Application::createTransformationScene()
@@ -75,14 +45,6 @@ void Application::createTransformationScene()
     secondTransformation->addTransformation(std::make_shared<Translation>(0.5f, 0.0f, 0.0f));
     second->setTransformation(secondTransformation);
     scene1->addObject(second);
-}
-
-void Application::createSphereScene()
-{
-    auto sphere = std::make_shared<DrawableObject>(sphereModel, shader1);
-    sphere->setColorMode(3);
-    sphere->setTransformation(std::make_shared<Scale>(0.7f, 0.7f, 0.7f));
-    scene2->addObject(sphere);
 }
 
 void Application::createForest(Scene* scene, ShaderProgram* shader)
@@ -130,9 +92,36 @@ void Application::createForest(Scene* scene, ShaderProgram* shader)
     }
 }
 
+void Application::createNightForestScene()
+{
+    createForest(scene6, phongShader);
+    Light fireflyLight;
+    fireflyLight.position = glm::vec3(0.0f, 2.0f, 18.0f);
+    fireflyLight.color = glm::vec3(5.0f, 4.9f, 4.7f);
+    fireflyLight.constant = 1.0f;
+    fireflyLight.linear = 0.7f;
+    fireflyLight.quadratic = 1.8f;
+    scene6->setLight(fireflyLight);
+
+    auto firefly = std::make_shared<DrawableObject>(sphereModel, ambientShader);
+    auto transformation = std::make_shared<CompositeTransformation>();
+
+    transformation->addTransformation(std::make_shared<Translation>(
+        fireflyLight.position.x,
+        fireflyLight.position.y,
+        fireflyLight.position.z));
+
+    transformation->addTransformation(
+        std::make_shared<Scale>(0.08f, 0.08f, 0.08f));
+
+    firefly->setTransformation(transformation);
+    firefly->setColor(glm::vec3(1.0f, 0.98f, 0.94f));
+    scene6->addObject(firefly);
+}
+
 void Application::createForestScene()
 {
-    createForest(scene3, shader1);
+    createForest(scene2, shader1);
 
     glm::vec3 positions[] = {
         glm::vec3(-3.0f, 1.7f, 16.0f),
@@ -147,7 +136,7 @@ void Application::createForestScene()
         transformation->addTransformation(std::make_shared<Rotation>(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
         transformation->addTransformation(std::make_shared<Scale>(-1.0f, 1.0f, 1.0f));
         object->setTransformation(transformation);
-        scene3->addObject(object);
+        scene2->addObject(object);
     }
 }
 
@@ -168,7 +157,7 @@ void Application::createLoginScene()
     transformation->addTransformation(loginRotationZ);
     transformation->addTransformation(loginScale);
     object->setTransformation(transformation);
-    scene4->addObject(object);
+    scene3->addObject(object);
 }
 
 void Application::createSolarScene()
@@ -179,7 +168,7 @@ void Application::createSolarScene()
     sunTransformation->addTransformation(sunRotation);
     sunTransformation->addTransformation(std::make_shared<Scale>(0.45f, 0.45f, 0.45f));
     sun->setTransformation(sunTransformation);
-    scene5->addObject(sun);
+    scene4->addObject(sun);
 
     auto earthOrbit = std::make_shared<CompositeTransformation>();
     earthOrbitRotation = std::make_shared<Rotation>(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -193,7 +182,7 @@ void Application::createSolarScene()
     earthTransformation->addTransformation(earthSelfRotation);
     earthTransformation->addTransformation(std::make_shared<Scale>(0.22f, 0.22f, 0.22f));
     earth->setTransformation(earthTransformation);
-    scene5->addObject(earth);
+    scene4->addObject(earth);
 
     auto moonOrbit = std::make_shared<CompositeTransformation>();
     moonOrbitRotation = std::make_shared<Rotation>(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -208,7 +197,7 @@ void Application::createSolarScene()
     moonTransformation->addTransformation(moonSelfRotation);
     moonTransformation->addTransformation(std::make_shared<Scale>(0.09f, 0.09f, 0.09f));
     moon->setTransformation(moonTransformation);
-    scene5->addObject(moon);
+    scene4->addObject(moon);
 
     auto airplane = std::make_shared<DrawableObject>(airplaneModel, phongShader);
     auto airplaneTransformation = std::make_shared<CompositeTransformation>();
@@ -221,14 +210,7 @@ void Application::createSolarScene()
     airplaneTransformation->addTransformation(airplaneSelfRotation);
     airplaneTransformation->addTransformation(std::make_shared<Scale>(0.4f, 0.4f, 0.4f));
     airplane->setTransformation(airplaneTransformation);
-    scene5->addObject(airplane);
-}
-
-void Application::createClockScene()
-{
-    auto object = std::make_shared<DrawableObject>(clock, clockShader);
-    object->setTransformation(std::make_shared<Scale>(-1.0f, 1.0f, 1.0f));
-    scene6->addObject(object);
+    scene4->addObject(airplane);
 }
 
 void Application::createLightingScene()
@@ -249,43 +231,52 @@ void Application::createLightingScene()
         transformation->addTransformation(std::make_shared<Scale>(0.5f, 0.5f, 0.5f));
         sphere->setTransformation(transformation);
         sphere->setColor(glm::vec3(0.385f, 0.647f, 0.812f));
-        scene7->addObject(sphere);
+        scene5->addObject(sphere);
     }
 }
 
-void Application::createTextureScene()
+void Application::addClassroomObject(Model* model, std::shared_ptr<Texture> texture,
+    const glm::vec3& position, float rotation, float scale, ShaderProgram* shader)
 {
-    int text_width, text_height, channels;
-    stbi_set_flip_vertically_on_load(true);
-
-    unsigned char* data = stbi_load("wooden_fence.jpg", &text_width, &text_height, &channels, 4);
-    if (!data) {
-        std::printf("Error loading texture: wooden_fence.png\n");
-    }
-
-    glActiveTexture(GL_TEXTURE0);
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, text_width, text_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_image_free(data);
-
-    textureShader->use();
-    textureShader->setUniform("samplerTexture", 0);
-
-    auto ground = std::make_shared<DrawableObject>(groundTModel, textureShader);
+    auto object = std::make_shared<DrawableObject>(model, shader ? shader : textureShader);
+    object->setTexture(texture);
 
     auto transformation = std::make_shared<CompositeTransformation>();
-    transformation->addTransformation(std::make_shared<Scale>(3.0f, 1.0f, 3.0f));
-    ground->setTransformation(transformation);
+    transformation->addTransformation(std::make_shared<Translation>(position.x, position.y, position.z));
+    transformation->addTransformation(std::make_shared<Rotation>(glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f)));
+    transformation->addTransformation(std::make_shared<Scale>(scale, scale, scale));
+    object->setTransformation(transformation);
+    scene7->addObject(object);
+}
 
-    scene9->addObject(ground);
+void Application::createClassroomScene()
+{
+    auto classroomTexture = std::make_shared<Texture>("Textures/EB408/classroom.png");
+    auto doorTexture = std::make_shared<Texture>("Textures/EB408/door.png");
+    auto boardTexture = std::make_shared<Texture>("Textures/EB408/whiteboard.png");
+    auto tableTexture = std::make_shared<Texture>("Textures/EB408/table.png");
+    auto chairTexture = std::make_shared<Texture>("Textures/EB408/chair.png");
+    auto shrekTexture = std::make_shared<Texture>("Textures/Characters/shrek.png");
+
+    scene7->setSkybox(std::make_shared<Skybox>(skyboxShader, "Textures/Skybox"));
+    addClassroomObject(classroomModel, classroomTexture, glm::vec3(0.0f));
+    addClassroomObject(whiteboardModel, boardTexture, glm::vec3(-3.75f, 0.0f, 4.0f));
+    addClassroomObject(doorModel, doorTexture, glm::vec3(-2.45f, 0.006f, 7.75f));
+    addClassroomObject(shrekModel, shrekTexture, glm::vec3(-2.8f, 0.008f, 6.65f), 135.0f, 0.85f);
+
+    const float rowStartZ[] = { 1.07f, 1.09f, 1.12f };
+
+    for (int row = 0; row < 3; row++)
+    {
+        for (int column = 0; column < 3; column++)
+        {
+            float x = -1.3f + row * 1.5f;
+            float z = rowStartZ[row] + column * 1.8f;
+            addClassroomObject(tableModel, tableTexture, glm::vec3(x, 0.0f, z), 90.0f);
+            addClassroomObject(chairModel, chairTexture, glm::vec3(x + 0.7f, 0.006f, z - 0.4f), -90.0f);
+            addClassroomObject(chairModel, chairTexture, glm::vec3(x + 0.7f, 0.006f, z + 0.4f), -90.0f);
+            addClassroomObject(monitorModel, nullptr, glm::vec3(x - 0.15f, 0.67f, z - 0.4f), 90.0f, 1.0f, ambientShader);
+            addClassroomObject(monitorModel, nullptr, glm::vec3(x - 0.15f, 0.67f, z + 0.4f), 90.0f, 1.0f, ambientShader);
+        }
+    }
 }

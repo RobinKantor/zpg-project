@@ -33,6 +33,7 @@ private:
     ShaderProgram* phongShader = nullptr;
     ShaderProgram* blinnShader = nullptr;
     ShaderProgram* textureShader = nullptr;
+    ShaderProgram* skyboxShader = nullptr;
 
     Model* model1 = nullptr;
     Model* sphereModel = nullptr;
@@ -44,8 +45,14 @@ private:
     Model* moonModel = nullptr;
     Model* clock = nullptr;
     Model* groundModel = nullptr;
-    Model* groundTModel = nullptr;
     Model* airplaneModel = nullptr;
+    Model* classroomModel = nullptr;
+    Model* doorModel = nullptr;
+    Model* whiteboardModel = nullptr;
+    Model* tableModel = nullptr;
+    Model* chairModel = nullptr;
+    Model* shrekModel = nullptr;
+    Model* monitorModel = nullptr;
 
     Scene* scene1 = nullptr;
     Scene* scene2 = nullptr;
@@ -54,8 +61,6 @@ private:
     Scene* scene5 = nullptr;
     Scene* scene6 = nullptr;
     Scene* scene7 = nullptr;
-    Scene* scene8 = nullptr;
-    Scene* scene9 = nullptr;
     Scene* activeScene = nullptr;
     int activeSceneNumber = 0;
 
@@ -88,14 +93,15 @@ private:
 
     void setScene(int number);
     void createTransformationScene();
-    void createSphereScene();
     void createForestScene();
     void createForest(Scene* scene, ShaderProgram* shader);
     void createLoginScene();
     void createSolarScene();
-    void createClockScene();
+    void createNightForestScene();
     void createLightingScene();
-    void createTextureScene();
+    void createClassroomScene();
+    void addClassroomObject(Model* model, std::shared_ptr<Texture> texture,
+        const glm::vec3& position, float rotation = 0.0f, float scale = 1.0f, ShaderProgram* shader = nullptr);
     void drawLogin();
     void resetCamera();
     void processInput(float deltaTime);

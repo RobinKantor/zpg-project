@@ -53,6 +53,12 @@ void DrawableObject::draw(const Light& light)
 
     shaderProgram->setUniform("material.shininess", material.shininess);
 
+    if (texture)
+    {
+        texture->bind();
+        shaderProgram->setUniform("samplerTexture", 0);
+    }
+
     model->draw();
 }
 
@@ -70,4 +76,9 @@ void DrawableObject::setColorMode(int mode)
 void DrawableObject::setMaterial(const Material& material)
 {
     this->material = material;
+}
+
+void DrawableObject::setTexture(std::shared_ptr<Texture> texture)
+{
+    this->texture = texture;
 }

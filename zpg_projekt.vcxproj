@@ -41,7 +41,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>D:\KAN0310\zpg_projekt\zpg-project\Dependencies\stbimage;C:\Users\kan0310\Downloads\glad\include;C:\Users\kan0310\Downloads\glad;$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\stbimage;$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -67,6 +67,8 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Translation.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -83,6 +85,9 @@
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Transformation.h" />
     <ClInclude Include="Translation.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Dependencies\stbimage\stb_image.h" />
     <ClInclude Include="Models\bushes.h" />
     <ClInclude Include="Models\clock.h" />
     <ClInclude Include="Models\earth.h" />
@@ -90,6 +95,13 @@
     <ClInclude Include="Models\KAN0310.h" />
     <ClInclude Include="Models\moon.h" />
     <ClInclude Include="Models\plain.h" />
+    <ClInclude Include="Models\classroom.h" />
+    <ClInclude Include="Models\door.h" />
+    <ClInclude Include="Models\whiteboard.h" />
+    <ClInclude Include="Models\table.h" />
+    <ClInclude Include="Models\chair.h" />
+    <ClInclude Include="Models\shrek.h" />
+    <ClInclude Include="Models\monitor.h" />
     <ClInclude Include="Models\sphere.h" />
     <ClInclude Include="Models\boeing737.h" />
     <ClInclude Include="Models\sun.h" />
@@ -110,8 +122,22 @@
     <None Include="Models\Source\B737_nologo.glb" />
     <None Include="Models\Source\AMVLab_License.txt" />
     <None Include="Models\Source\B737_attribution.txt" />
-    <None Include="texture.frag" />
-    <None Include="texture.vert" />
+    <None Include="Shaders\texture.frag" />
+    <None Include="Shaders\texture.vert" />
+    <None Include="Shaders\skybox.vert" />
+    <None Include="Shaders\skybox.frag" />
+    <None Include="Textures\Characters\shrek.png" />
+    <None Include="Textures\EB408\chair.png" />
+    <None Include="Textures\EB408\classroom.png" />
+    <None Include="Textures\EB408\door.png" />
+    <None Include="Textures\EB408\table.png" />
+    <None Include="Textures\EB408\whiteboard.png" />
+    <None Include="Textures\Skybox\negx.jpg" />
+    <None Include="Textures\Skybox\negy.jpg" />
+    <None Include="Textures\Skybox\negz.jpg" />
+    <None Include="Textures\Skybox\posx.jpg" />
+    <None Include="Textures\Skybox\posy.jpg" />
+    <None Include="Textures\Skybox\posz.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="CheckShaderLocation" BeforeTargets="PrepareForBuild">
@@ -123,8 +149,10 @@
   <Target Name="CopyRuntimeFiles" AfterTargets="Build">
     <ItemGroup>
       <ShaderToCopy Include="$(ProjectDir)Shaders\*.vert;$(ProjectDir)Shaders\*.frag" />
+      <TextureToCopy Include="$(ProjectDir)Textures\**\*" />
     </ItemGroup>
     <Copy SourceFiles="@(ShaderToCopy)" DestinationFolder="$(OutDir)Shaders" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(TextureToCopy)" DestinationFiles="@(TextureToCopy->'$(OutDir)Textures\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(ProjectDir)Dependencies\glfw\lib\glfw3.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
 </Project>

@@ -11,6 +11,7 @@
 #include "ShaderProgram.h"
 #include "Transformation.h"
 #include "Material.h"
+#include "Texture.h"
 
 class DrawableObject
 {
@@ -18,6 +19,7 @@ private:
     Model* model;
     ShaderProgram* shaderProgram;
     Material material;
+    std::shared_ptr<Texture> texture;
 
     std::shared_ptr<Transformation> transformation;
     int colorMode = 0;
@@ -37,4 +39,5 @@ public:
     void setColor(const glm::vec3& color);
     void setColorMode(int mode);
     void setMaterial(const Material& material);
+    void setTexture(std::shared_ptr<Texture> texture);
 };
