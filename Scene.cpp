@@ -22,8 +22,10 @@ void Scene::draw()
     if (skybox)
         skybox->draw();
 
+    GLuint id = 0;
     for (const auto& object : objects)
     {
+        glStencilFunc(GL_ALWAYS, id++, 0xFF);
         object->draw(light);
     }
 }

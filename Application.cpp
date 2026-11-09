@@ -264,6 +264,46 @@ void Application::processInput(float deltaTime)
             camera.move(movement.y * speed * deltaTime, movement.x * speed * deltaTime);
         }
     }
+
+    static bool leftMousePressedLastFrame = false;
+    bool leftMousePressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+
+    if (leftMousePressed && !leftMousePressedLastFrame)
+    {
+        double cursorX, cursorY;
+        glfwGetCursorPos(window, &cursorX, &cursorY);
+
+        GLint x = static_cast<GLint>(cursorX);
+        GLint y = static_cast<GLint>(cursorY);
+
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+
+        int newy = height - y;
+
+        GLbyte color[4];
+        GLfloat depth;
+        GLuint index;
+
+        glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+        glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+        glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+        printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index %u\n",
+            x, y, color[0], color[1], color[2], color[3], depth, index);
+
+        glm::vec3 screenX = glm::vec3(x, newy, depth);
+
+        glm::mat4 view = camera.getViewMatrix();
+        glm::mat4 projection = camera.getProjectionMatrix();
+
+        glm::vec4 viewPort = glm::vec4(0, 0, width, height);
+        glm::vec3 pos = glm::unProject(screenX, view, projection, viewPort);
+
+        printf("unProject [%f,%f,%f]\n", pos.x, pos.y, pos.z);
+    }
+
+    leftMousePressedLastFrame = leftMousePressed;
 }
 
 bool Application::keyPressed(int key) const
@@ -313,6 +353,8 @@ void Application::drawLogin()
 void Application::run()
 {
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     double previousTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window))

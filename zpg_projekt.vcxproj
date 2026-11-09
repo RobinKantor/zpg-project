@@ -41,7 +41,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\stbimage;$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\KAN0310\zpg_projekt\zpg-project\Dependencies\glad\include;$(ProjectDir)Dependencies\stbimage;$(ProjectDir)Dependencies\glad\include;$(ProjectDir)Dependencies\glfw\include;$(ProjectDir)Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">_DEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">NDEBUG;GLFW_DLL;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
