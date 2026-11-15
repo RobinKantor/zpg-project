@@ -178,6 +178,20 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
         app->rotationX = app->rotationY = app->rotationZ = 0.0f;
         app->objectScale = 0.8f;
     }
+    else if (key == GLFW_KEY_I) {
+        app->clickMode = ClickMode::Insert;
+        printf("ClickMode zmenen na vkladani.\n");
+    }
+    else if (key == GLFW_KEY_P) {
+        app->clickMode = ClickMode::Pick;
+        printf("ClickMode zmenen na vybirani.\n");
+    }
+    else if (key == GLFW_KEY_M)
+    {
+        app->clickMode = ClickMode::Move;
+        app->hasMoveStart = false;
+        printf("ClickMode zmenen na pohybovani.\n");
+    }
 }
 
 void Application::setScene(int number)
@@ -264,46 +278,101 @@ void Application::processInput(float deltaTime)
             camera.move(movement.y * speed * deltaTime, movement.x * speed * deltaTime);
         }
     }
+}
 
-    static bool leftMousePressedLastFrame = false;
-    bool leftMousePressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+void Application::readPick()
+{
+    static bool wasPressed = false;
+    bool pressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    bool clicked = pressed && !wasPressed;
+    wasPressed = pressed;
 
-    if (leftMousePressed && !leftMousePressedLastFrame)
+    if (!clicked)
+        return;
+
+    double cursorX, cursorY;
+    glfwGetCursorPos(window, &cursorX, &cursorY);
+
+    int windowWidth, windowHeight, width, height;
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
+    glfwGetFramebufferSize(window, &width, &height);
+
+    if (width <= 0 || height <= 0 || windowWidth <= 0 || windowHeight <= 0 ||
+        cursorX < 0 || cursorY < 0 || cursorX >= windowWidth || cursorY >= windowHeight)
+        return;
+
+    int x = static_cast<int>(cursorX * width / windowWidth);
+    int y = height - 1 - static_cast<int>(cursorY * height / windowHeight);
+
+    GLuint id = 0;
+    glReadPixels(x, y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &id);
+    std::printf("ID objektu: %u\n", id);
+
+    if (activeScene == scene2 && clickMode == ClickMode::Pick &&
+        movingObjectID != 0 && id == static_cast<GLuint>(movingObjectID))
     {
-        double cursorX, cursorY;
-        glfwGetCursorPos(window, &cursorX, &cursorY);
-
-        GLint x = static_cast<GLint>(cursorX);
-        GLint y = static_cast<GLint>(cursorY);
-
-        int width, height;
-        glfwGetWindowSize(window, &width, &height);
-
-        int newy = height - y;
-
-        GLbyte color[4];
-        GLfloat depth;
-        GLuint index;
-
-        glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
-        glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-        glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
-
-        printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index %u\n",
-            x, y, color[0], color[1], color[2], color[3], depth, index);
-
-        glm::vec3 screenX = glm::vec3(x, newy, depth);
-
-        glm::mat4 view = camera.getViewMatrix();
-        glm::mat4 projection = camera.getProjectionMatrix();
-
-        glm::vec4 viewPort = glm::vec4(0, 0, width, height);
-        glm::vec3 pos = glm::unProject(screenX, view, projection, viewPort);
-
-        printf("unProject [%f,%f,%f]\n", pos.x, pos.y, pos.z);
+        activeScene->removeObject(movingObjectID);
+        movingTranslation.reset();
+        movingObjectID = 0;
+        return;
     }
 
-    leftMousePressedLastFrame = leftMousePressed;
+    float depth = 1.0f;
+    glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+    if (depth >= 1.0f) {
+        return;
+    }
+
+    glm::vec3 screenPoint(x + 0.5f, y + 0.5f, depth);
+    glm::vec4 viewport(0.0f, 0.0f, width, height);
+
+    glm::vec3 worldPoint = glm::unProject(
+        screenPoint,
+        camera.getViewMatrix(),
+        camera.getProjectionMatrix(),
+        viewport
+    );
+
+    std::printf("Pozice ve svete: (%.2f, %.2f, %.2f)\n", worldPoint.x, worldPoint.y, worldPoint.z);
+
+    if (activeScene == scene2 && clickMode == ClickMode::Insert)
+    {
+        auto tree = std::make_shared<DrawableObject>(treeModel, shader1);
+        tree->setColorMode(2);
+        tree->setTransformation(std::make_shared<Translation>(
+            worldPoint.x, worldPoint.y, worldPoint.z));
+        activeScene->addObject(tree);
+    }
+
+    if (activeScene == scene2 && clickMode == ClickMode::Move && !movingTranslation)
+    {
+        worldPoint.y += 0.5f;
+
+        if (!hasMoveStart)
+        {
+            moveStart = worldPoint;
+            hasMoveStart = true;
+            return;
+        }
+
+        moveEnd = worldPoint;
+        hasMoveStart = false;
+        moveStartTime = glfwGetTime();
+
+        movingTranslation = std::make_shared<Translation>(
+            moveStart.x, moveStart.y, moveStart.z);
+
+        auto ball = std::make_shared<DrawableObject>(sphereModel, ambientShader);
+        ball->setColor(glm::vec3(0.2f, 0.6f, 1.0f));
+        ball->setTransformation(movingTranslation);
+        activeScene->addObject(ball);
+        movingObjectID = ball->getID();
+
+        if (movingObjectID == 0)
+        {
+            movingTranslation.reset();
+        }
+    }
 }
 
 bool Application::keyPressed(int key) const
@@ -383,8 +452,23 @@ void Application::run()
         if (activeSceneNumber == 2)
             updateClock();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (movingTranslation)
+        {
+            float seconds = static_cast<float>(now - moveStartTime);
+            float phase = glm::mod(seconds / 3.0f, 2.0f);
+
+            float t = phase;
+            if (phase > 1.0f)
+                t = 2.0f - phase;
+
+            glm::vec3 position = moveStart + t * (moveEnd - moveStart);
+
+            movingTranslation->setTranslation(position.x, position.y, position.z);
+        }
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         activeScene->draw();
+        readPick();
         drawLogin();
         glfwSwapBuffers(window);
     }

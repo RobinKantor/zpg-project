@@ -5,11 +5,27 @@
 
 #include "Scene.h"
 
-void Scene::addObject(
-    std::shared_ptr<DrawableObject> object
-)
+void Scene::addObject(std::shared_ptr<DrawableObject> object)
 {
+    if (nextObjectID > 255)
+        return;
+
+    object->setID(nextObjectID++);
     objects.push_back(object);
+}
+
+void Scene::removeObject(int id) 
+{
+    for (int i = 0; i < objects.size(); ++i) 
+    {
+        const auto& object = objects[i];
+
+        if (object->getID() == id) 
+        {
+            objects.erase(objects.begin() + i);
+            return;
+        }
+    }
 }
 
 void Scene::setLight(const Light& light)
@@ -22,10 +38,9 @@ void Scene::draw()
     if (skybox)
         skybox->draw();
 
-    GLuint id = 0;
     for (const auto& object : objects)
     {
-        glStencilFunc(GL_ALWAYS, id++, 0xFF);
+        glStencilFunc(GL_ALWAYS, object->getID(), 0xFF);
         object->draw(light);
     }
 }

@@ -16,6 +16,7 @@
 class DrawableObject
 {
 private:
+    int id = 0;
     Model* model;
     ShaderProgram* shaderProgram;
     Material material;
@@ -35,6 +36,8 @@ public:
         std::shared_ptr<Transformation> transformation
     );
 
+    int getID() const { return id; }
+    void setID(int value) { id = value; }
     void draw(const Light& light);
     void setColor(const glm::vec3& color);
     void setColorMode(int mode);

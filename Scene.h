@@ -16,14 +16,14 @@
 class Scene
 {
 private:
+    int nextObjectID = 1;
     std::vector<std::shared_ptr<DrawableObject>> objects;
     Light light;
     std::shared_ptr<Skybox> skybox;
 
 public:
-    void addObject(
-        std::shared_ptr<DrawableObject> object
-    );
+    void addObject(std::shared_ptr<DrawableObject> object);
+    void removeObject(int id);
     void setLight(const Light& light);
     void setSkybox(std::shared_ptr<Skybox> skybox);
 

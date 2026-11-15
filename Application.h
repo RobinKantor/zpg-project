@@ -19,6 +19,9 @@
 #include "Rotation.h"
 #include "Scale.h"
 
+
+enum class ClickMode { Pick, Insert, Move };
+
 class Application
 {
 private:
@@ -91,6 +94,13 @@ private:
     double lastMouseX = 0.0;
     double lastMouseY = 0.0;
 
+    bool hasMoveStart = false;
+    glm::vec3 moveStart{ 0.0f };
+    glm::vec3 moveEnd{ 0.0f };
+    std::shared_ptr<Translation> movingTranslation;
+    int movingObjectID = 0;
+    double moveStartTime = 0.0;
+
     void setScene(int number);
     void createTransformationScene();
     void createForestScene();
@@ -110,6 +120,8 @@ private:
     static void framebufferCallback(GLFWwindow* window, int width, int height);
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+    void readPick();
+    ClickMode clickMode = ClickMode::Pick;
 
 public:
     ~Application();
