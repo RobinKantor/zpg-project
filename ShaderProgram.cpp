@@ -106,6 +106,18 @@ void ShaderProgram::setUniform(const char* name, float x, float y, float z)
     glUniform3f(glGetUniformLocation(shaderProgram, name), x, y, z);
 }
 
+void ShaderProgram::setUniform(const char* name, const glm::vec3& vector)
+{
+    use();
+    glUniform3fv(glGetUniformLocation(shaderProgram, name), 1, glm::value_ptr(vector));
+}
+
+void ShaderProgram::setUniform(const char* name, const glm::vec4& vector)
+{
+    use();
+    glUniform4fv(glGetUniformLocation(shaderProgram, name), 1, glm::value_ptr(vector));
+}
+
 void ShaderProgram::setUniform(const char* name, const glm::mat4& matrix)
 {
     use();

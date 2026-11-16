@@ -37,6 +37,7 @@ private:
     ShaderProgram* blinnShader = nullptr;
     ShaderProgram* textureShader = nullptr;
     ShaderProgram* skyboxShader = nullptr;
+    ShaderProgram* multiPhongShader = nullptr;
 
     Model* model1 = nullptr;
     Model* sphereModel = nullptr;

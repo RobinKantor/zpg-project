@@ -215,17 +215,31 @@ void Application::createSolarScene()
 
 void Application::createLightingScene()
 {
+    multiPhongShader->use();
+    multiPhongShader->setUniform("numberOfLights", 3);
+
+    multiPhongShader->setUniform("lights[0].position", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    multiPhongShader->setUniform("lights[0].diffuse", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    multiPhongShader->setUniform("lights[0].specular", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    multiPhongShader->setUniform("lights[1].position", glm::vec4(3.0f, 0.0f, -3.0f, 1.0f));
+    multiPhongShader->setUniform("lights[1].diffuse", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    multiPhongShader->setUniform("lights[1].specular", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+    multiPhongShader->setUniform("lights[2].position", glm::vec4(0.0f, 3.0f, -3.0f, 1.0f));
+    multiPhongShader->setUniform("lights[2].diffuse", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    multiPhongShader->setUniform("lights[2].specular", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
     glm::vec3 positions[] = {
-        glm::vec3(-1.1f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.1f, 0.0f),
-        glm::vec3(1.1f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.1f, 0.0f)
+        glm::vec3(-1.1f, 0.0f, -3.0f),
+        glm::vec3(0.0f, 1.1f, -3.0f),
+        glm::vec3(1.1f, 0.0f, -3.0f),
+        glm::vec3(0.0f, -1.1f, -3.0f)
     };
-    ShaderProgram* shaders[] = { ambientShader, lambertShader, phongShader, blinnShader };
 
     for (int i = 0; i < 4; i++)
     {
-        auto sphere = std::make_shared<DrawableObject>(sphereModel, shaders[i]);
+        auto sphere = std::make_shared<DrawableObject>(sphereModel, multiPhongShader);
         auto transformation = std::make_shared<CompositeTransformation>();
         transformation->addTransformation(std::make_shared<Translation>(positions[i].x, positions[i].y, positions[i].z));
         transformation->addTransformation(std::make_shared<Scale>(0.5f, 0.5f, 0.5f));

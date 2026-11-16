@@ -30,6 +30,8 @@ public:
 	void setUniform(const char* name, float value);
 	void setUniform(const char* name, int value);
 	void setUniform(const char* name, float x, float y, float z);
+	void setUniform(const char* name, const glm::vec3& vector);
+	void setUniform(const char* name, const glm::vec4& vector);
 	void setUniform(const char* name, const glm::mat4& matrix);
 	void setLight(const Light& light);
 };

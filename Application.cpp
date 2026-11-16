@@ -125,6 +125,7 @@ void Application::createShaders()
     blinnShader = new ShaderProgram("Shaders/light.vert", "Shaders/blinn.frag", &camera);
     textureShader = new ShaderProgram("Shaders/texture.vert", "Shaders/texture.frag", &camera);
     skyboxShader = new ShaderProgram("Shaders/skybox.vert", "Shaders/skybox.frag", &camera);
+    multiPhongShader = new ShaderProgram("Shaders/light.vert", "Shaders/multiPhong.frag", &camera);
 }
 
 void Application::createModels()
